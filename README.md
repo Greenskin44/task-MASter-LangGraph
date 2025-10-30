@@ -1,109 +1,498 @@
-![LangChain Academy](https://cdn.prod.website-files.com/65b8cd72835ceeacd4449a53/66e9eba1020525eea7873f96_LCA-big-green%20(2).svg)
+# LangGraph Production Project
 
-## Introduction
+A comprehensive collection of production-ready LangGraph implementations demonstrating core patterns, multi-agent coordination, memory management, and real-world applications. This project showcases best practices for building, testing, and deploying LangGraph applications.
 
-Welcome to LangChain Academy! 
-This is a growing set of modules focused on foundational concepts within the LangChain ecosystem. 
-Module 0 is basic setup and Modules 1 - 4 focus on LangGraph, progressively adding more advanced themes. 
-In each module folder, you'll see a set of notebooks. A LangChain Academy accompanies each notebook 
-to guide you through the topic. Each module also has a `studio` subdirectory, with a set of relevant 
-graphs that we will explore using the LangGraph API and Studio.
+## Overview
 
-## Setup
+This project contains multiple LangGraph implementations organized by purpose:
 
-### Python version
+- **Studio Graphs**: Demonstration graphs showcasing core LangGraph patterns (parallelization, sub-graphs, map-reduce, multi-agent research)
+- **Deployment Graphs**: Production-ready implementations with memory persistence (Task Maistro personal assistant)
+- **Email Assistant**: Automated email triage and response generation
+- **Research Agent**: Deep research workflows with multi-agent coordination
 
-To get the most out of this course, please ensure you're using Python 3.11 or later. 
-This version is required for optimal compatibility with LangGraph. If you're on an older version, 
-upgrading will ensure everything runs smoothly.
+All graphs are designed to run seamlessly in LangGraph Studio for local development and testing.
+
+## Features
+
+- ✅ **Production-Ready Code**: Follows Python best practices with type hints, docstrings, and error handling
+- ✅ **Comprehensive Testing**: 26+ test scenarios covering all graph implementations
+- ✅ **Memory Persistence**: Multi-namespace memory management with Trustcall integration
+- ✅ **Multi-Agent Coordination**: Parallel agent execution with supervisor patterns
+- ✅ **Copy-Paste Demos**: Ready-to-use examples in `demo-text.txt` for smooth demonstrations
+- ✅ **LangSmith Integration**: Built-in tracing and monitoring support
+
+## Prerequisites
+
+- **Python 3.11+** (Python 3.11 or 3.12 recommended)
+- **OpenAI API Key** (required for all graphs)
+- **Tavily API Key** (required for research and search graphs)
+- **LangSmith API Key** (optional but recommended for tracing)
+
+## Quick Start
+
+### 1. Clone the Repository
+
+```bash
+git clone <repository-url>
+cd langgraph-project
 ```
-python3 --version
-```
 
-### Clone repo
-```
-git clone https://github.com/langchain-ai/langchain-academy.git
-$ cd langchain-academy
-```
+### 2. Create Virtual Environment
 
-### Create an environment and install dependencies
 #### Mac/Linux/WSL
-```
-$ python3 -m venv lc-academy-env
-$ source lc-academy-env/bin/activate
-$ pip install -r requirements.txt
-```
-#### Windows Powershell
-```
-PS> python3 -m venv lc-academy-env
-PS> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-PS> lc-academy-env\scripts\activate
-PS> pip install -r requirements.txt
+```bash
+python3 -m venv project-env
+source project-env/bin/activate
 ```
 
-### Running notebooks
-If you don't have Jupyter set up, follow installation instructions [here](https://jupyter.org/install).
-```
-$ jupyter notebook
-```
-
-### Setting up env variables
-Briefly going over how to set up environment variables. You can also 
-use a `.env` file with `python-dotenv` library.
-#### Mac/Linux/WSL
-```
-$ export API_ENV_VAR="your-api-key-here"
-```
-#### Windows Powershell
-```
-PS> $env:API_ENV_VAR = "your-api-key-here"
+#### Windows PowerShell
+```powershell
+python -m venv project-env
+.\project-env\Scripts\Activate.ps1
 ```
 
-### Set OpenAI API key
-* If you don't have an OpenAI API key, you can sign up [here](https://openai.com/index/openai-api/).
-*  Set `OPENAI_API_KEY` in your environment 
-
-### Sign up and Set LangSmith API
-* Sign up for LangSmith [here](https://smith.langchain.com/), find out more about LangSmith
-* and how to use it within your workflow [here](https://www.langchain.com/langsmith), and relevant library [docs](https://docs.smith.langchain.com/)!
-*  Set `LANGSMITH_API_KEY`, `LANGSMITH_TRACING_V2=true` `LANGSMITH_PROJECT="langchain-academy"`in your environment 
-
-### Set up Tavily API for web search
-
-* Tavily Search API is a search engine optimized for LLMs and RAG, aimed at efficient, 
-quick, and persistent search results. 
-* You can sign up for an API key [here](https://tavily.com/). 
-It's easy to sign up and offers a very generous free tier. Some lessons (in Module 4) will use Tavily. 
-
-* Set `TAVILY_API_KEY` in your environment.
-
-### Set up LangGraph Studio
-
-* LangGraph Studio is a custom IDE for viewing and testing agents.
-* Studio can be run locally and opened in your browser on Mac, Windows, and Linux.
-* See documentation [here](https://langchain-ai.github.io/langgraph/concepts/langgraph_studio/#local-development-server) on the local Studio development server and [here](https://langchain-ai.github.io/langgraph/cloud/how-tos/studio/quick_start/#local-development-server). 
-* Graphs for LangGraph Studio are in the `module-x/studio/` folders.
-* To start the local development server, run the following command in your terminal in the `/studio` directory each module:
-
+#### Windows Command Prompt
+```cmd
+python -m venv project-env
+project-env\Scripts\activate.bat
 ```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+This installs all required packages including:
+- LangGraph and LangChain core libraries
+- OpenAI integration
+- Tavily web search
+- Testing frameworks (pytest)
+- Development tools (black, ruff, mypy)
+
+### 4. Configure Environment Variables
+
+Create a `.env` file in the project root by copying the example:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and add your API keys:
+
+```bash
+# Required
+OPENAI_API_KEY=sk-your-openai-key-here
+TAVILY_API_KEY=tvly-your-tavily-key-here
+
+# Optional but recommended
+LANGSMITH_API_KEY=lsv2_pt_your-langsmith-key-here
+LANGSMITH_TRACING=true
+LANGSMITH_PROJECT=langgraph-project
+```
+
+**Getting API Keys:**
+- **OpenAI**: Sign up at [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+- **Tavily**: Sign up at [https://tavily.com](https://tavily.com) (generous free tier)
+- **LangSmith**: Sign up at [https://smith.langchain.com](https://smith.langchain.com)
+
+### 5. Run LangGraph Studio
+
+#### For Studio Graphs (Demos)
+
+```bash
+cd studio
 langgraph dev
 ```
 
-You should see the following output:
+#### For Deployment Graphs (Production)
+
+```bash
+cd deployment
+langgraph dev
+```
+
+You should see output like:
+
 ```
 - 🚀 API: http://127.0.0.1:2024
 - 🎨 Studio UI: https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
 - 📚 API Docs: http://127.0.0.1:2024/docs
 ```
 
-Open your browser and navigate to the Studio UI: `https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024`.
+### 6. Open LangGraph Studio
 
-* To use Studio, you will need to create a .env file with the relevant API keys
-* Run this from the command line to create these files for module 1 to 5, as an example:
+Navigate to the Studio UI in your browser:
+
 ```
-for i in {1..5}; do
-  cp module-$i/studio/.env.example module-$i/studio/.env
-  echo "OPENAI_API_KEY=\"$OPENAI_API_KEY\"" > module-$i/studio/.env
-done
-echo "TAVILY_API_KEY=\"$TAVILY_API_KEY\"" >> module-4/studio/.env
+https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
 ```
+
+Select a graph from the dropdown and use examples from `demo-text.txt` to test!
+
+## Project Structure
+
+```
+langgraph-project/
+├── studio/                      # Demo graphs for LangGraph Studio
+│   ├── parallelization.py       # Parallel web + Wikipedia search
+│   ├── sub_graphs.py            # Nested graph composition
+│   ├── map_reduce.py            # Map-reduce joke generation
+│   ├── research_assistant.py    # Multi-agent research
+│   ├── langgraph.json           # Studio configuration
+│   └── requirements.txt         # Studio dependencies
+│
+├── deployment/                  # Production graphs
+│   ├── task_maistro.py          # Personal assistant with memory
+│   ├── langgraph.json           # Deployment configuration
+│   └── requirements.txt         # Deployment dependencies
+│
+├── email_assistant/             # Email processing workflows
+│   ├── email_assistant.py       # Main email triage graph
+│   ├── configuration.py         # Configuration management
+│   ├── prompts.py               # Email processing prompts
+│   ├── schemas.py               # Pydantic models
+│   └── tools/                   # Email-related tools
+│
+├── deep-research-agent/         # Research agent implementation
+│   ├── research_agent_full.py   # Full research workflow
+│   ├── multi_agent_supervisor.py # Multi-agent coordination
+│   └── prompts.py               # Research prompts
+│
+├── tests/                       # Comprehensive test suite
+│   ├── test_studio_graphs.py    # Studio graph tests
+│   ├── test_deployment_graphs.py # Deployment tests
+│   ├── test_email_assistant.py  # Email assistant tests
+│   └── test_research_agent.py   # Research agent tests
+│
+├── docs/                        # Documentation
+│   ├── DEMO_GUIDE.md            # Step-by-step demo walkthrough
+│   ├── MAINTENANCE_NOTES.md     # Known limitations and improvements
+│   ├── TESTING_RESULTS.md       # Test execution results
+│   └── [other docs]             # Additional documentation
+│
+├── demo-text.txt                # Copy-paste ready examples
+├── requirements.txt             # Root dependencies
+├── .env.example                 # Environment variable template
+└── README.md                    # This file
+```
+
+## Running Tests
+
+The project includes a comprehensive test suite with 26+ test scenarios.
+
+### Run All Tests
+
+```bash
+pytest tests/ -v
+```
+
+### Run Specific Test Categories
+
+```bash
+# Studio graphs only
+pytest tests/test_studio_graphs.py -v
+
+# Deployment graphs only
+pytest tests/test_deployment_graphs.py -v
+
+# Email assistant only
+pytest tests/test_email_assistant.py -v
+
+# Research agent only
+pytest tests/test_research_agent.py -v
+```
+
+### Run Tests by Marker
+
+```bash
+# Integration tests (use real APIs)
+pytest -m integration -v
+
+# Unit tests (mocked dependencies)
+pytest -m unit -v
+
+# Specific graph category
+pytest -m studio -v
+pytest -m deployment -v
+```
+
+### Test with Coverage
+
+```bash
+pytest --cov=graphs tests/
+```
+
+**Note**: Tests require `OPENAI_API_KEY` to be set. Tests will automatically skip if API keys are missing.
+
+## Using Demo Examples
+
+The `demo-text.txt` file contains copy-paste ready examples for all graphs. To use them:
+
+1. Start LangGraph Studio (see "Run LangGraph Studio" above)
+2. Open `demo-text.txt` in a text editor
+3. Find the graph you want to test
+4. Copy the example input
+5. Paste into the Studio UI input field
+6. Click "Run" and observe the results
+
+All examples are designed to work without modification!
+
+## Graph Descriptions
+
+### Studio Graphs
+
+#### 1. Parallelization
+Demonstrates parallel execution by simultaneously searching the web (Tavily) and Wikipedia, then synthesizing results.
+
+**Use Case**: Answering questions that benefit from multiple information sources
+
+**Example Input**:
+```json
+{
+  "question": "What is LangGraph?"
+}
+```
+
+#### 2. Sub-Graphs
+Demonstrates nested graph composition with two parallel sub-graphs for log analysis.
+
+**Use Case**: Processing data through multiple specialized workflows
+
+**Example Input**:
+```json
+{
+  "raw_logs": [
+    {"id": "1", "question": "How do I use Chroma?", "grade": 2, "feedback": "Poor quality"}
+  ]
+}
+```
+
+#### 3. Map-Reduce
+Demonstrates the map-reduce pattern using Send() API for parallel joke generation and selection.
+
+**Use Case**: Generating multiple options and selecting the best one
+
+**Example Input**:
+```json
+{
+  "topic": "artificial intelligence"
+}
+```
+
+#### 4. Research Assistant
+Demonstrates multi-agent research with analyst personas conducting parallel interviews.
+
+**Use Case**: Comprehensive research from multiple perspectives
+
+**Example Input**:
+```json
+{
+  "topic": "LangGraph architecture patterns",
+  "max_analysts": 2,
+  "human_analyst_feedback": "approve"
+}
+```
+
+### Deployment Graphs
+
+#### Task Maistro
+Production-ready personal assistant with multi-namespace memory (profile, todos, instructions).
+
+**Use Case**: Personal task management with long-term memory
+
+**Example Input**:
+```json
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "I need to finish the project report by Friday"
+    }
+  ]
+}
+```
+
+**Configuration**:
+```json
+{
+  "configurable": {
+    "user_id": "user_123",
+    "todo_category": "work",
+    "thread_id": "thread_001"
+  }
+}
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### Issue: `langgraph: command not found`
+
+**Solution**: Make sure you've installed dependencies and activated your virtual environment:
+
+```bash
+# Activate virtual environment
+source project-env/bin/activate  # Mac/Linux
+.\project-env\Scripts\Activate.ps1  # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+#### Issue: `Error: Missing API key`
+
+**Solution**: Verify your `.env` file exists and contains valid API keys:
+
+```bash
+# Check if .env exists
+ls -la .env  # Mac/Linux
+dir .env     # Windows
+
+# Verify contents (don't commit this file!)
+cat .env     # Mac/Linux
+type .env    # Windows
+```
+
+Make sure there are no quotes around the API keys in the `.env` file:
+
+```bash
+# Correct
+OPENAI_API_KEY=sk-abc123
+
+# Incorrect
+OPENAI_API_KEY="sk-abc123"
+```
+
+#### Issue: `ModuleNotFoundError: No module named 'langgraph'`
+
+**Solution**: Install dependencies in your virtual environment:
+
+```bash
+pip install -r requirements.txt
+```
+
+#### Issue: Studio UI shows "Connection Error"
+
+**Solution**: 
+1. Verify `langgraph dev` is running without errors
+2. Check that port 2024 is not in use by another application
+3. Try restarting the dev server
+4. Check firewall settings
+
+#### Issue: Tests fail with "API key not set"
+
+**Solution**: Set the API key as an environment variable before running tests:
+
+```bash
+# Mac/Linux
+export OPENAI_API_KEY="your-key-here"
+
+# Windows PowerShell
+$env:OPENAI_API_KEY = "your-key-here"
+
+# Windows Command Prompt
+set OPENAI_API_KEY=your-key-here
+```
+
+#### Issue: Slow graph execution
+
+**Solution**: 
+- This is normal for graphs making multiple API calls
+- Research Assistant can take 30-90 seconds due to parallel agent coordination
+- Check your internet connection
+- Verify API rate limits haven't been exceeded
+
+#### Issue: Python version mismatch
+
+**Solution**: This project requires Python 3.11+. Check your version:
+
+```bash
+python --version
+```
+
+If you have multiple Python versions, specify the correct one:
+
+```bash
+python3.11 -m venv project-env
+```
+
+#### Issue: Import errors in tests
+
+**Solution**: Make sure you're running tests from the project root:
+
+```bash
+cd /path/to/langgraph-project
+pytest tests/ -v
+```
+
+#### Issue: Graph not appearing in Studio dropdown
+
+**Solution**: 
+1. Check `langgraph.json` configuration in the directory where you ran `langgraph dev`
+2. Verify the graph file path is correct
+3. Ensure the graph is properly exported (e.g., `graph = builder.compile()`)
+4. Restart `langgraph dev`
+
+### Getting Help
+
+If you encounter issues not covered here:
+
+1. Check the [LangGraph Documentation](https://langchain-ai.github.io/langgraph/)
+2. Review the `docs/MAINTENANCE_NOTES.md` for known limitations
+3. Check the `docs/TESTING_RESULTS.md` for test-specific issues
+4. Open an issue in the project repository
+
+## Development
+
+### Code Quality
+
+The project follows Python best practices:
+
+- **Type Hints**: All functions have type annotations
+- **Docstrings**: Comprehensive documentation for all modules, classes, and functions
+- **Error Handling**: Graceful error handling with meaningful messages
+- **PEP 8**: Code formatted with Black and linted with Ruff
+
+### Running Code Quality Checks
+
+```bash
+# Format code
+black .
+
+# Lint code
+ruff check .
+
+# Type checking
+mypy graphs/
+```
+
+### Adding New Graphs
+
+See `docs/MAINTENANCE_NOTES.md` for guidance on:
+- Adding new graph implementations
+- Updating dependencies
+- Extending the test suite
+- Contributing to the project
+
+## Documentation
+
+- **[DEMO_GUIDE.md](docs/DEMO_GUIDE.md)**: Step-by-step walkthrough for demonstrating each graph
+- **[MAINTENANCE_NOTES.md](docs/MAINTENANCE_NOTES.md)**: Known limitations, technical debt, and future improvements
+- **[TESTING_RESULTS.md](docs/TESTING_RESULTS.md)**: Comprehensive test execution results
+- **[ARCHITECTURE_DESIGN.md](docs/ARCHITECTURE_DESIGN.md)**: Detailed architecture and design decisions
+- **[TESTING_PLAN.md](docs/TESTING_PLAN.md)**: Testing strategy and scenarios
+
+## License
+
+[Add your license information here]
+
+## Contributing
+
+[Add contribution guidelines here]
+
+## Acknowledgments
+
+Built with [LangGraph](https://github.com/langchain-ai/langgraph) and [LangChain](https://github.com/langchain-ai/langchain).

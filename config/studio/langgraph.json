@@ -1,0 +1,14 @@
+{
+  "dockerfile_lines": [],
+  "graphs": {
+    "parallelization": "../../graphs/studio/parallelization.py:graph",
+    "sub_graphs": "../../graphs/studio/sub_graphs.py:graph",
+    "map_reduce": "../../graphs/studio/map_reduce.py:graph",
+    "research_assistant": "../../graphs/studio/research_assistant.py:graph"
+  },
+  "env": "./.env",
+  "python_version": "3.11",
+  "dependencies": [
+    "./requirements.txt"
+  ]
+}
