@@ -253,4 +253,7 @@ overall_workflow = (
     .add_edge(START, "triage_router")
 )
 
-email_assistant = overall_workflow.compile()
+graph = overall_workflow.compile()
+
+# Backward compatibility alias
+email_assistant = graph

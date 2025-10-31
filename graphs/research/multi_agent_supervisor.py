@@ -262,4 +262,7 @@ supervisor_builder = StateGraph(SupervisorState)
 supervisor_builder.add_node("supervisor", supervisor)
 supervisor_builder.add_node("supervisor_tools", supervisor_tools)
 supervisor_builder.add_edge(START, "supervisor")
-supervisor_agent = supervisor_builder.compile()
+graph = supervisor_builder.compile()
+
+# Backward compatibility alias
+supervisor_agent = graph

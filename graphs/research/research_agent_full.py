@@ -32,7 +32,7 @@ writer_model = init_chat_model(
 
 # ===== FINAL REPORT GENERATION =====
 
-from deep_research_from_scratch.state_scope import AgentState
+from graphs.research.state_scope import AgentState
 
 
 async def final_report_generation(state: AgentState):
@@ -79,4 +79,7 @@ deep_researcher_builder.add_edge("supervisor_subgraph", "final_report_generation
 deep_researcher_builder.add_edge("final_report_generation", END)
 
 # Compile the full workflow
-agent = deep_researcher_builder.compile()
+graph = deep_researcher_builder.compile()
+
+# Backward compatibility alias
+agent = graph

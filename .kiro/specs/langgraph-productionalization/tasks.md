@@ -114,7 +114,7 @@
   - Remove unused imports and variables
   - _Requirements: 4.5_
 
-- [ ] 6. Create comprehensive test suite
+- [x] 6. Create comprehensive test suite
 
 - [x] 6.1 Set up testing infrastructure
 
@@ -187,7 +187,7 @@
   - Confirm all graphs execute successfully
   - _Requirements: 5.4_
 
-- [-] 8. Create demo assets
+- [x] 8. Create demo assets
 
 - [x] 8.1 Create demo-text.txt structure
 
@@ -219,23 +219,11 @@
 
 - [x] 8.5 Add research agent examples
 
-
   - Add 2+ examples for research workflow
   - Include examples with and without human feedback
   - _Requirements: 6.1, 6.4_
 
 - [x] 8.6 Test all demo examples
-
-
-
-
-
-
-
-
-
-
-
 
   - Copy-paste each example into Studio UI
   - Verify each example executes without modification
@@ -245,25 +233,7 @@
 
 - [x] 9. Create comprehensive documentation
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 - [x] 9.1 Write README.md
-
-
-
-
-
 
   - Add project overview and purpose
   - Add setup instructions for virtual environment
@@ -272,9 +242,7 @@
   - Add troubleshooting section for common issues
   - _Requirements: 7.1, 7.2, 7.3_
 
-
 - [x] 9.2 Write DEMO_GUIDE.md
-
 
   - Add step-by-step demo walkthrough for each graph
   - Document expected outputs for each demo scenario
@@ -283,8 +251,6 @@
   - _Requirements: 7.4, 7.5_
 
 - [x] 9.3 Write MAINTENANCE_NOTES.md
-
-
 
   - Document known limitations of each graph
   - Add suggestions for future improvements
@@ -295,13 +261,7 @@
 
 - [x] 10. Final validation and quality assurance
 
-
-
-
-
-
 - [x] 10.1 Validate langgraph dev execution
-
 
   - Run `langgraph dev` in each configuration directory
   - Verify zero errors in console output
@@ -311,16 +271,12 @@
 
 - [x] 10.2 Execute all graphs with test inputs
 
-
-
   - Run each graph with test inputs from test suite
   - Verify successful execution for all graphs
   - Document any failures or issues
   - _Requirements: 8.2_
 
 - [x] 10.3 Validate demo examples
-
-
 
   - Copy-paste each example from demo-text.txt
   - Verify execution without errors
@@ -329,16 +285,12 @@
 
 - [x] 10.4 Verify dependency specifications
 
-
-
   - Check all requirements.txt files for pinned versions
   - Verify no dependency conflicts
   - Test installation in fresh virtual environment
   - _Requirements: 8.4_
 
 - [x] 10.5 Verify code quality standards
-
-
 
   - Run black formatter and verify no changes needed
   - Run ruff linter and verify no issues
@@ -348,8 +300,197 @@
 
 - [x] 10.6 Create final validation checklist
 
-
   - Confirm all success criteria are met
   - Document any remaining issues or limitations
   - Create summary of productionalization outcomes
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
+
+- [ ] 11. Consolidate project structure to unified configuration
+
+- [-] 11.1 Backup current state
+
+
+  - Commit all current changes to git
+  - Create backup branch: backup-pre-consolidation
+  - Verify backup branch exists
+  - _Requirements: 4.1_
+
+- [ ] 11.2 Create archive folder structure
+
+  - Create archive/ folder at root
+  - Create archive/README.md documenting archived content
+  - _Requirements: 4.1_
+
+- [ ] 11.3 Standardize entry point variables
+
+  - Modify graphs/email_assistant/email_assistant.py to use 'graph' variable
+  - Modify graphs/research/research_agent_full.py to use 'graph' variable
+  - Modify graphs/research/multi_agent_supervisor.py to use 'graph' variable
+  - Add backward compatibility aliases for all three files
+  - Test that existing tests still pass
+  - _Requirements: 4.1, 4.5_
+
+- [ ] 11.4 Create unified root langgraph.json
+
+  - Create langgraph.json at project root
+  - Register all 8 graphs with standardized paths
+  - Configure unified dependencies and environment
+  - Verify JSON syntax is valid
+  - _Requirements: 3.2, 4.1_
+
+- [ ] 11.5 Test unified configuration
+
+  - Run langgraph dev from project root
+  - Verify all 8 graphs appear in console output
+  - Open Studio UI and verify all graphs in dropdown
+  - Test that each graph can be selected without errors
+  - _Requirements: 5.4, 8.1_
+
+- [ ] 11.6 Test each graph individually in Studio
+
+  - Test parallelization with demo example
+  - Test sub_graphs with demo example
+  - Test map_reduce with demo example
+  - Test research_assistant with demo example
+  - Test task_maistro with demo example
+  - Test email_assistant with demo example
+  - Test research_agent_full with demo example
+  - Document any failures or issues
+  - _Requirements: 5.4, 8.2, 8.3_
+
+- [ ] 11.7 Run full test suite before archiving
+
+  - Run pytest tests/ -v
+  - Verify all tests pass (or skip gracefully)
+  - Document any test failures
+  - _Requirements: 5.2, 8.2_
+
+- [ ] 11.8 Archive old folder structure
+
+  - Move studio/ to archive/studio/
+  - Move deployment/ to archive/deployment/
+  - Move email_assistant/ to archive/email_assistant/
+  - Move deep-research-agent/ to archive/deep-research-agent/
+  - Move deep_agents/ to archive/deep_agents/
+  - Move report-team-MAS-LangGraph/ to archive/report-team-MAS-LangGraph/
+  - Verify all 6 folders are in archive/
+  - Verify graphs/ folder remains at root
+  - _Requirements: 4.1_
+
+- [ ] 11.9 Verify consolidation after archiving
+
+  - Stop and restart langgraph dev
+  - Verify all 8 graphs still appear
+  - Quick test 2-3 graphs to confirm functionality
+  - _Requirements: 8.1, 8.2_
+
+- [ ] 11.10 Clean up environment configuration
+
+  - Check archived .env files for unique variables
+  - Merge any missing variables into root .env
+  - Update .env.example if needed
+  - _Requirements: 3.3_
+
+- [ ] 11.11 Update documentation for consolidation
+
+  - Update README.md with unified structure
+  - Update ARCHITECTURE_DESIGN.md if needed
+  - Create MIGRATION_LOG.md documenting changes
+  - Document archive/ folder purpose
+  - _Requirements: 7.1, 7.6_
+
+- [ ] 11.12 Final end-to-end validation
+
+  - Test all demo examples from demo-text.txt
+  - Verify all examples execute successfully
+  - Document results in TESTING_RESULTS.md
+  - _Requirements: 8.2, 8.3_
+
+- [ ] 11.13 Commit consolidation changes
+
+  - Git add and commit all changes
+  - Create consolidation-complete tag
+  - _Requirements: 4.1_
+
+- [ ] 12. Fix remaining test failures and deprecation warnings
+
+- [ ] 12.1 Fix email assistant test failures
+
+  - Verify html2text is installed in project-env
+  - Run email assistant tests to confirm they pass
+  - Document any remaining issues with email assistant
+  - _Requirements: 5.1, 5.2, 8.2_
+
+- [ ] 12.2 Fix research assistant test failures
+
+  - Update research assistant tests to handle interrupt_before properly
+  - Implement multi-step test execution for human-in-the-loop workflow
+  - Verify final_report is generated after human feedback
+  - Document expected behavior for interrupted graphs
+  - _Requirements: 5.1, 5.2, 8.2_
+
+- [ ] 12.3 Fix deprecation warnings in codebase
+
+  - Update Send imports from langgraph.types instead of langgraph.constants
+  - Update config_schema to context_schema in task_maistro.py
+  - Update min_items to min_length in Pydantic models
+  - Update TavilySearchResults to use langchain-tavily package
+  - _Requirements: 4.5, 8.5_
+
+- [ ] 12.4 Verify all tests pass
+
+  - Run full test suite with pytest
+  - Confirm 0 failures (all tests pass or skip gracefully)
+  - Update TESTING_RESULTS.md with final results
+  - _Requirements: 5.2, 8.2_
+
+- [ ] 13. Final project cleanup and structure validation
+
+- [ ] 13.1 Audit remaining project structure
+
+  - List all remaining folders at root level
+  - Identify any redundant or obsolete folders
+  - Document purpose of each remaining folder
+  - _Requirements: 4.1, 7.6_
+
+- [ ] 13.2 Remove or archive redundant files and folders
+
+  - Remove .langgraph_api/ folders (runtime data, not needed in repo)
+  - Remove .pytest_cache/ (test cache, not needed in repo)
+  - Remove __pycache__/ folders (Python cache, not needed in repo)
+  - Archive or remove config/ folder if no longer needed
+  - Remove any duplicate or obsolete documentation files
+  - _Requirements: 4.1, 4.5_
+
+- [ ] 13.3 Update .gitignore for clean repository
+
+  - Add .langgraph_api/ to .gitignore
+  - Add .pytest_cache/ to .gitignore
+  - Add __pycache__/ to .gitignore
+  - Add project-env/ to .gitignore (virtual environment)
+  - Verify no unnecessary files are tracked
+  - _Requirements: 4.5_
+
+- [ ] 13.4 Validate minimal folder structure
+
+  - Verify only essential folders remain at root
+  - Confirm folder structure matches design document
+  - Document final folder structure in README.md
+  - Ensure navigation is clear and intuitive
+  - _Requirements: 4.1, 7.1_
+
+- [ ] 13.5 Final quality assurance check
+
+  - Run langgraph dev and verify all 8 graphs work
+  - Run full test suite and verify all tests pass
+  - Review all documentation for accuracy
+  - Confirm project is production-ready and easy to navigate
+  - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
+
+- [ ] 13.6 Create final project summary
+
+  - Document final folder structure
+  - List all 8 graphs with descriptions
+  - Summarize consolidation outcomes
+  - Note any remaining limitations or future work
+  - _Requirements: 7.1, 7.6, 8.1_
