@@ -107,10 +107,12 @@ async def supervisor(state: SupervisorState) -> Command[Literal["supervisor_tool
     supervisor_messages = state.get("supervisor_messages", [])
 
     # Prepare system message with current date and constraints
-    system_message = lead_researcher_prompt.format(
-        date=get_today_str(),
-        max_concurrent_research_units=max_concurrent_researchers,
-        max_researcher_iterations=max_researcher_iterations,
+    # Use replace() instead of format() to avoid issues with curly braces in content
+    system_message = (
+        lead_researcher_prompt
+        .replace("{date}", get_today_str())
+        .replace("{max_concurrent_research_units}", str(max_concurrent_researchers))
+        .replace("{max_researcher_iterations}", str(max_researcher_iterations))
     )
     messages = [SystemMessage(content=system_message)] + supervisor_messages
 

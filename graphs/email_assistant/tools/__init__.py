@@ -1,6 +1,6 @@
-from email_assistant.tools.base import get_tools, get_tools_by_name
-from email_assistant.tools.default.email_tools import write_email, triage_email, Done
-from email_assistant.tools.default.calendar_tools import (
+from graphs.email_assistant.tools.base import get_tools, get_tools_by_name
+from graphs.email_assistant.tools.default.email_tools import write_email, triage_email, Done
+from graphs.email_assistant.tools.default.calendar_tools import (
     schedule_meeting,
     check_calendar_availability,
 )

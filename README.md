@@ -4,12 +4,25 @@ A comprehensive collection of production-ready LangGraph implementations demonst
 
 ## Overview
 
-This project contains multiple LangGraph implementations organized by purpose:
+This project contains 8 production-ready LangGraph implementations in a unified structure. **All graphs launch with a single command** from the project root.
 
-- **Studio Graphs**: Demonstration graphs showcasing core LangGraph patterns (parallelization, sub-graphs, map-reduce, multi-agent research)
-- **Deployment Graphs**: Production-ready implementations with memory persistence (Task Maistro personal assistant)
-- **Email Assistant**: Automated email triage and response generation
-- **Research Agent**: Deep research workflows with multi-agent coordination
+### Graph Categories
+
+- **Studio Graphs (4)**: Demonstration graphs showcasing core LangGraph patterns
+  - Parallelization: Parallel web + Wikipedia search
+  - Sub-Graphs: Nested graph composition for log analysis
+  - Map-Reduce: Map-reduce pattern for joke generation
+  - Research Assistant: Multi-agent research with analyst personas
+
+- **Deployment Graphs (1)**: Production-ready implementations with memory persistence
+  - Task Maistro: Personal assistant with multi-namespace memory
+
+- **Email Assistant (1)**: Automated email triage and response generation
+  - Email Assistant: Intelligent email classification and response
+
+- **Research Agents (2)**: Deep research workflows with multi-agent coordination
+  - Research Agent Full: Comprehensive research with user clarification
+  - Multi-Agent Supervisor: Supervisor pattern for agent coordination
 
 All graphs are designed to run seamlessly in LangGraph Studio for local development and testing.
 
@@ -99,27 +112,32 @@ LANGSMITH_PROJECT=langgraph-project
 
 ### 5. Run LangGraph Studio
 
-#### For Studio Graphs (Demos)
+**One command launches all 8 graphs:**
 
 ```bash
-cd studio
-langgraph dev
-```
-
-#### For Deployment Graphs (Production)
-
-```bash
-cd deployment
 langgraph dev
 ```
 
 You should see output like:
 
 ```
+✓ Starting LangGraph API server...
+✓ Loaded 8 graphs:
+  - parallelization
+  - sub_graphs
+  - map_reduce
+  - research_assistant
+  - task_maistro
+  - email_assistant
+  - research_agent_full
+  - multi_agent_supervisor
+✓ Server running at http://127.0.0.1:2024
+```
+
+**API Endpoints:**
 - 🚀 API: http://127.0.0.1:2024
 - 🎨 Studio UI: https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
 - 📚 API Docs: http://127.0.0.1:2024/docs
-```
 
 ### 6. Open LangGraph Studio
 
@@ -129,36 +147,44 @@ Navigate to the Studio UI in your browser:
 https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
 ```
 
-Select a graph from the dropdown and use examples from `demo-text.txt` to test!
+**All 8 graphs will appear in the dropdown menu.** Select any graph and use examples from `demo-text.txt` to test!
 
 ## Project Structure
 
 ```
 langgraph-project/
-├── studio/                      # Demo graphs for LangGraph Studio
-│   ├── parallelization.py       # Parallel web + Wikipedia search
-│   ├── sub_graphs.py            # Nested graph composition
-│   ├── map_reduce.py            # Map-reduce joke generation
-│   ├── research_assistant.py    # Multi-agent research
-│   ├── langgraph.json           # Studio configuration
-│   └── requirements.txt         # Studio dependencies
+├── langgraph.json               # ✨ Unified config for ALL 8 graphs
+├── requirements.txt             # All dependencies (pinned versions)
+├── .env                         # Environment variables (API keys)
+├── .env.example                 # Environment variable template
+├── demo-text.txt                # Copy-paste ready examples
+├── README.md                    # This file
 │
-├── deployment/                  # Production graphs
-│   ├── task_maistro.py          # Personal assistant with memory
-│   ├── langgraph.json           # Deployment configuration
-│   └── requirements.txt         # Deployment dependencies
-│
-├── email_assistant/             # Email processing workflows
-│   ├── email_assistant.py       # Main email triage graph
-│   ├── configuration.py         # Configuration management
-│   ├── prompts.py               # Email processing prompts
-│   ├── schemas.py               # Pydantic models
-│   └── tools/                   # Email-related tools
-│
-├── deep-research-agent/         # Research agent implementation
-│   ├── research_agent_full.py   # Full research workflow
-│   ├── multi_agent_supervisor.py # Multi-agent coordination
-│   └── prompts.py               # Research prompts
+├── graphs/                      # All graph implementations
+│   ├── studio/                  # 4 demo graphs
+│   │   ├── parallelization.py       # Parallel web + Wikipedia search
+│   │   ├── sub_graphs.py            # Nested graph composition
+│   │   ├── map_reduce.py            # Map-reduce joke generation
+│   │   └── research_assistant.py    # Multi-agent research
+│   │
+│   ├── deployment/              # 1 production graph
+│   │   ├── task_maistro.py          # Personal assistant with memory
+│   │   └── configuration.py         # Configuration management
+│   │
+│   ├── email_assistant/         # 1 email processing graph
+│   │   ├── email_assistant.py       # Email triage and response
+│   │   ├── configuration.py         # Configuration management
+│   │   ├── prompts.py               # Email processing prompts
+│   │   ├── schemas.py               # Pydantic models
+│   │   ├── utils.py                 # Utility functions
+│   │   └── tools/                   # Email-related tools
+│   │
+│   └── research/                # 2 research agent graphs
+│       ├── research_agent_full.py   # Full research workflow
+│       ├── multi_agent_supervisor.py # Multi-agent coordination
+│       ├── prompts.py               # Research prompts
+│       ├── utils.py                 # Utility functions
+│       └── state_*.py               # State definitions
 │
 ├── tests/                       # Comprehensive test suite
 │   ├── test_studio_graphs.py    # Studio graph tests
@@ -170,13 +196,28 @@ langgraph-project/
 │   ├── DEMO_GUIDE.md            # Step-by-step demo walkthrough
 │   ├── MAINTENANCE_NOTES.md     # Known limitations and improvements
 │   ├── TESTING_RESULTS.md       # Test execution results
+│   ├── ARCHITECTURE_DESIGN.md   # Architecture and design decisions
 │   └── [other docs]             # Additional documentation
 │
-├── demo-text.txt                # Copy-paste ready examples
-├── requirements.txt             # Root dependencies
-├── .env.example                 # Environment variable template
-└── README.md                    # This file
+├── archive/                     # Archived old structure (reference only)
+│   ├── README.md                # Explains what's archived and why
+│   ├── studio/                  # Old studio folder
+│   ├── deployment/              # Old deployment folder
+│   ├── email_assistant/         # Old email assistant (with variants)
+│   ├── deep-research-agent/     # Old research agent
+│   ├── deep_agents/             # Experimental notebooks
+│   └── report-team-MAS-LangGraph/ # Learning materials
+│
+└── MIGRATION_LOG.md             # Consolidation documentation
 ```
+
+### Key Structure Features
+
+✨ **Unified Configuration:** Single `langgraph.json` at root registers all 8 graphs  
+✨ **One Command:** `langgraph dev` launches everything  
+✨ **Clear Organization:** Graphs organized by category in `graphs/` folder  
+✨ **No Duplication:** Old scattered folders archived for reference  
+✨ **Production Ready:** All graphs tested and working
 
 ## Running Tests
 
@@ -444,6 +485,26 @@ If you encounter issues not covered here:
 2. Review the `docs/MAINTENANCE_NOTES.md` for known limitations
 3. Check the `docs/TESTING_RESULTS.md` for test-specific issues
 4. Open an issue in the project repository
+
+## Archive Folder
+
+The `archive/` folder contains the original scattered project structure that was consolidated on November 5, 2025. These folders are preserved for reference but are **not used** by the active project:
+
+- **archive/studio/** - Old demo graphs (duplicate of graphs/studio/)
+- **archive/deployment/** - Old production graphs (duplicate of graphs/deployment/)
+- **archive/email_assistant/** - Old email assistant with unique HITL variants and evaluation tools
+- **archive/deep-research-agent/** - Old research agents (duplicate of graphs/research/)
+- **archive/deep_agents/** - Experimental notebooks and tools
+- **archive/report-team-MAS-LangGraph/** - Learning materials with langmem
+
+**Why archived?** The project was consolidated to use a single `langgraph.json` configuration at the root, eliminating the need for separate folder structures. The archive preserves:
+- Historical code for reference
+- Unique variants (HITL email assistants, Gmail integration)
+- Evaluation tools and datasets
+- Learning materials and notebooks
+- Original repository history
+
+See `archive/README.md` and `MIGRATION_LOG.md` for complete consolidation details.
 
 ## Development
 

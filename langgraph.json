@@ -6,7 +6,9 @@
     "map_reduce": "./graphs/studio/map_reduce.py:graph",
     "research_assistant": "./graphs/studio/research_assistant.py:graph",
     "task_maistro": "./graphs/deployment/task_maistro.py:graph",
-    "email_assistant": "./graphs/email_assistant/email_assistant.py:graph"
+    "email_assistant": "./graphs/email_assistant/email_assistant.py:graph",
+    "research_agent_full": "./graphs/research/research_agent_full.py:graph",
+    "multi_agent_supervisor": "./graphs/research/multi_agent_supervisor.py:graph"
   },
   "env": "./.env",
   "python_version": "3.11",
