@@ -116,10 +116,10 @@ def parse_email(email_input: dict) -> dict:
 
     Args:
         email_input (dict): Dictionary containing email fields:
-            - author: Sender's name and email
-            - to: Recipient's name and email
+            - author or from_email: Sender's name and email
+            - to or to_email: Recipient's name and email
             - subject: Email subject line
-            - email_thread: Full email content
+            - email_thread or page_content: Full email content
 
     Returns:
         tuple[str, str, str, str]: Tuple containing:
@@ -128,12 +128,16 @@ def parse_email(email_input: dict) -> dict:
             - subject: Email subject line
             - email_thread: Full email content
     """
-    return (
-        email_input["author"],
-        email_input["to"],
-        email_input["subject"],
-        email_input["email_thread"],
-    )
+    # Support both 'author' and 'from_email' field names
+    author = email_input.get("author") or email_input.get("from_email")
+    # Support both 'to' and 'to_email' field names
+    to = email_input.get("to") or email_input.get("to_email")
+    # Get subject
+    subject = email_input.get("subject")
+    # Support both 'email_thread' and 'page_content' field names
+    email_thread = email_input.get("email_thread") or email_input.get("page_content")
+    
+    return (author, to, subject, email_thread)
 
 
 def parse_gmail(email_input: dict) -> tuple[str, str, str, str, str]:

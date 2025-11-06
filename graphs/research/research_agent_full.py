@@ -18,8 +18,7 @@ from graphs.research.utils import get_today_str
 from graphs.research.prompts import final_report_generation_prompt
 from graphs.research.state_scope import AgentState, AgentInputState
 
-# Note: research_agent_scope module needs to be created or imported separately
-# from graphs.research.research_agent_scope import clarify_with_user, write_research_brief
+from graphs.research.research_agent_scope import clarify_with_user, write_research_brief
 from graphs.research.multi_agent_supervisor import supervisor_agent
 
 # ===== Config =====
@@ -74,6 +73,7 @@ deep_researcher_builder.add_node("final_report_generation", final_report_generat
 
 # Add workflow edges
 deep_researcher_builder.add_edge(START, "clarify_with_user")
+deep_researcher_builder.add_edge("clarify_with_user", "write_research_brief")
 deep_researcher_builder.add_edge("write_research_brief", "supervisor_subgraph")
 deep_researcher_builder.add_edge("supervisor_subgraph", "final_report_generation")
 deep_researcher_builder.add_edge("final_report_generation", END)
