@@ -2,6 +2,14 @@
 
 A comprehensive collection of production-ready LangGraph implementations demonstrating core patterns, multi-agent coordination, memory management, and real-world applications. This project showcases best practices for building, testing, and deploying LangGraph applications.
 
+**🚀 Use as Template**: This repository is designed to serve as both a demonstration and a template for building your own LangGraph projects.
+
+### Template Quick Links
+- **[Quick Start Guide](QUICKSTART_TEMPLATE.md)** - Get started in 5 minutes
+- **[Template Usage Guide](TEMPLATE_USAGE.md)** - Comprehensive template documentation
+- **[Setup Checklist](SETUP_CHECKLIST.md)** - Step-by-step customization checklist
+- **[Template Graph](graphs/TEMPLATE_GRAPH.py)** - Minimal graph template to copy
+
 ## Overview
 
 This project contains 8 production-ready LangGraph implementations in a unified structure. **All graphs launch with a single command** from the project root.
