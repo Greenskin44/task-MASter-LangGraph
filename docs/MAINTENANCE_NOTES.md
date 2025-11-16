@@ -251,16 +251,22 @@ This document provides guidance for maintaining and extending the LangGraph prod
 - 26 test scenarios implemented
 - Focus on happy path testing
 - Limited edge case coverage
-- No performance tests
+- Performance benchmarking suite implemented (see `tests/test_benchmarks.py`)
 
 **Remediation Plan**:
 1. Add edge case tests (invalid inputs, API failures, etc.)
-2. Add performance benchmarks
+2. Establish baseline performance metrics for all graphs
 3. Add load tests for concurrent execution
 4. Increase coverage to 80%+
 
 **Priority**: Medium  
 **Estimated Effort**: 3-5 days
+
+**Performance Benchmarking**:
+- Benchmark suite available in `tests/test_benchmarks.py`
+- Run with: `pytest tests/test_benchmarks.py --benchmark-only`
+- See `docs/PERFORMANCE_BENCHMARKS.md` for detailed documentation
+- Use `scripts/run_benchmarks.py` for convenient benchmark execution
 
 ### Infrastructure
 
@@ -900,9 +906,19 @@ pytest tests/ -v -m "not integration"
 - Error rate
 
 **Tools**:
-- LangSmith for tracing and monitoring
-- Custom logging for metrics
-- Performance profiling with cProfile
+- **pytest-benchmark**: Automated performance benchmarking (see `tests/test_benchmarks.py`)
+- **LangSmith**: Tracing and monitoring for detailed execution analysis
+- **Custom logging**: Application-level metrics
+- **cProfile**: Python profiling for detailed performance analysis
+
+**Benchmarking Workflow**:
+1. Establish baseline: `python scripts/run_benchmarks.py --save baseline`
+2. Make changes to code
+3. Compare performance: `python scripts/run_benchmarks.py --compare baseline`
+4. Review results and identify regressions
+5. Update baseline after confirmed improvements
+
+See `docs/PERFORMANCE_BENCHMARKS.md` for comprehensive benchmarking documentation.
 
 ---
 

@@ -28,12 +28,11 @@ All graphs are designed to run seamlessly in LangGraph Studio for local developm
 
 ## Features
 
-- ✅ **Production-Ready Code**: Follows Python best practices with type hints, docstrings, and error handling
-- ✅ **Comprehensive Testing**: 26+ test scenarios covering all graph implementations
-- ✅ **Memory Persistence**: Multi-namespace memory management with Trustcall integration
-- ✅ **Multi-Agent Coordination**: Parallel agent execution with supervisor patterns
-- ✅ **Copy-Paste Demos**: Ready-to-use examples in `demo-text.txt` for smooth demonstrations
-- ✅ **LangSmith Integration**: Built-in tracing and monitoring support
+- **Comprehensive Testing**: 26+ test scenarios covering all graph implementations
+- **Memory Persistence**: Multi-namespace memory management with Trustcall integration
+- **Multi-Agent Coordination**: Parallel agent execution with supervisor patterns
+- **Copy-Paste Demos**: Ready-to-use examples in `demo-text.txt` for smooth demonstrations
+- **LangSmith Integration**: Built-in tracing and monitoring support
 
 ## Prerequisites
 
@@ -47,8 +46,8 @@ All graphs are designed to run seamlessly in LangGraph Studio for local developm
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd langgraph-project
+git clone https://github.com/greenskin44/task-MASter-LangGraph.git
+cd task-MASter-LangGraph
 ```
 
 ### 2. Create Virtual Environment
@@ -102,7 +101,7 @@ TAVILY_API_KEY=tvly-your-tavily-key-here
 # Optional but recommended
 LANGSMITH_API_KEY=lsv2_pt_your-langsmith-key-here
 LANGSMITH_TRACING=true
-LANGSMITH_PROJECT=langgraph-project
+LANGSMITH_PROJECT=task-MASter-LangGraph
 ```
 
 **Getting API Keys:**
@@ -135,9 +134,9 @@ You should see output like:
 ```
 
 **API Endpoints:**
-- 🚀 API: http://127.0.0.1:2024
-- 🎨 Studio UI: https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
-- 📚 API Docs: http://127.0.0.1:2024/docs
+- API: http://127.0.0.1:2024
+- Studio UI: https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
+- API Docs: http://127.0.0.1:2024/docs
 
 ### 6. Open LangGraph Studio
 
@@ -152,8 +151,8 @@ https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
 ## Project Structure
 
 ```
-langgraph-project/
-├── langgraph.json               # ✨ Unified config for ALL 8 graphs
+task-MASter-LangGraph/
+├── langgraph.json               # Unified config for ALL 8 graphs
 ├── requirements.txt             # All dependencies (pinned versions)
 ├── .env                         # Environment variables (API keys)
 ├── .env.example                 # Environment variable template
@@ -198,26 +197,14 @@ langgraph-project/
 │   ├── TESTING_RESULTS.md       # Test execution results
 │   ├── ARCHITECTURE_DESIGN.md   # Architecture and design decisions
 │   └── [other docs]             # Additional documentation
-│
-├── archive/                     # Archived old structure (reference only)
-│   ├── README.md                # Explains what's archived and why
-│   ├── studio/                  # Old studio folder
-│   ├── deployment/              # Old deployment folder
-│   ├── email_assistant/         # Old email assistant (with variants)
-│   ├── deep-research-agent/     # Old research agent
-│   ├── deep_agents/             # Experimental notebooks
-│   └── report-team-MAS-LangGraph/ # Learning materials
-│
-└── MIGRATION_LOG.md             # Consolidation documentation
 ```
 
 ### Key Structure Features
 
-✨ **Unified Configuration:** Single `langgraph.json` at root registers all 8 graphs  
-✨ **One Command:** `langgraph dev` launches everything  
-✨ **Clear Organization:** Graphs organized by category in `graphs/` folder  
-✨ **No Duplication:** Old scattered folders archived for reference  
-✨ **Production Ready:** All graphs tested and working
+- **Unified Configuration:** Single `langgraph.json` at root registers all 8 graphs
+- **One Command:** `langgraph dev` launches everything
+- **Clear Organization:** Graphs organized by category in `graphs/` folder
+- **Production Ready:** All graphs tested and working
 
 ## Running Tests
 
@@ -266,6 +253,52 @@ pytest --cov=graphs tests/
 ```
 
 **Note**: Tests require `OPENAI_API_KEY` to be set. Tests will automatically skip if API keys are missing.
+
+## Performance Benchmarking
+
+The project includes a performance benchmarking suite to measure execution times and detect performance regressions.
+
+### Run Benchmarks
+
+```bash
+# Run all benchmarks
+pytest tests/test_benchmarks.py --benchmark-only
+
+# Run with convenience script
+python scripts/run_benchmarks.py
+```
+
+### Save Baseline Metrics
+
+```bash
+# Save results as baseline
+pytest tests/test_benchmarks.py --benchmark-only --benchmark-save=baseline
+
+# Or use the script
+python scripts/run_benchmarks.py --save baseline
+```
+
+### Compare Performance
+
+```bash
+# Compare with baseline
+pytest tests/test_benchmarks.py --benchmark-only --benchmark-compare=baseline
+
+# Or use the script
+python scripts/run_benchmarks.py --compare baseline
+```
+
+### Generate Performance Reports
+
+```bash
+# Generate histogram
+python scripts/run_benchmarks.py --histogram
+
+# Fail if performance degrades by >10%
+pytest tests/test_benchmarks.py --benchmark-only --benchmark-compare=baseline --benchmark-compare-fail=mean:10%
+```
+
+See **[docs/PERFORMANCE_BENCHMARKS.md](docs/PERFORMANCE_BENCHMARKS.md)** for detailed benchmarking documentation, baseline metrics, and optimization strategies.
 
 ## Using Demo Examples
 
@@ -363,6 +396,73 @@ Production-ready personal assistant with multi-namespace memory (profile, todos,
     "todo_category": "work",
     "thread_id": "thread_001"
   }
+}
+```
+
+### Email Assistant Graphs
+
+#### Email Assistant
+Automated email triage and response generation with intelligent classification into three categories: respond, notify, or ignore.
+
+**Use Case**: Processing incoming emails and drafting appropriate responses
+
+**Example Input**:
+```json
+{
+  "email_input": {
+    "id": "email_001",
+    "thread_id": "thread_001",
+    "from_email": "sarah.johnson@techcorp.com",
+    "to_email": "greenskin44@email.com",
+    "subject": "Quick sync on API documentation",
+    "page_content": "Hi Lance,\n\nI hope this email finds you well. I wanted to reach out about the API documentation for the new LangChain endpoints. We're planning to integrate them into our product next week.\n\nCould we schedule a 30-minute call this week to discuss the authentication flow and rate limits? I'm available Tuesday afternoon or Thursday morning.\n\nLooking forward to hearing from you!\n\nBest regards,\nSarah Johnson\nSenior Engineer, TechCorp",
+    "send_time": "2024-01-15T09:30:00Z"
+  }
+}
+```
+
+### Research Agent Graphs
+
+#### Research Agent Full
+Comprehensive research workflow with user clarification, research brief generation, multi-agent coordination, and report synthesis.
+
+**Use Case**: Deep research on complex topics requiring multiple perspectives
+
+**Example Input**:
+```json
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "I'm building a production LangGraph application and need to understand deployment options, monitoring strategies, and scaling patterns."
+    }
+  ]
+}
+```
+
+**Configuration**:
+```json
+{
+  "configurable": {
+    "thread_id": "research_thread_001"
+  }
+}
+```
+
+#### Multi-Agent Supervisor
+Supervisor pattern for coordinating multiple research agents working in parallel on different aspects of a research topic.
+
+**Use Case**: Complex research tasks requiring parallel investigation and synthesis
+
+**Example Input**:
+```json
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "Research the latest developments in large language model architectures"
+    }
+  ]
 }
 ```
 
@@ -465,7 +565,7 @@ python3.11 -m venv project-env
 **Solution**: Make sure you're running tests from the project root:
 
 ```bash
-cd /path/to/langgraph-project
+cd /path/to/task-MASter-LangGraph
 pytest tests/ -v
 ```
 
@@ -486,37 +586,6 @@ If you encounter issues not covered here:
 3. Check the `docs/TESTING_RESULTS.md` for test-specific issues
 4. Open an issue in the project repository
 
-## Archive Folder
-
-The `archive/` folder contains the original scattered project structure that was consolidated on November 5, 2025. These folders are preserved for reference but are **not used** by the active project:
-
-- **archive/studio/** - Old demo graphs (duplicate of graphs/studio/)
-- **archive/deployment/** - Old production graphs (duplicate of graphs/deployment/)
-- **archive/email_assistant/** - Old email assistant with unique HITL variants and evaluation tools
-- **archive/deep-research-agent/** - Old research agents (duplicate of graphs/research/)
-- **archive/deep_agents/** - Experimental notebooks and tools
-- **archive/report-team-MAS-LangGraph/** - Learning materials with langmem
-
-**Why archived?** The project was consolidated to use a single `langgraph.json` configuration at the root, eliminating the need for separate folder structures. The archive preserves:
-- Historical code for reference
-- Unique variants (HITL email assistants, Gmail integration)
-- Evaluation tools and datasets
-- Learning materials and notebooks
-- Original repository history
-
-See `archive/README.md` and `MIGRATION_LOG.md` for complete consolidation details.
-
-## Development
-
-### Code Quality
-
-The project follows Python best practices:
-
-- **Type Hints**: All functions have type annotations
-- **Docstrings**: Comprehensive documentation for all modules, classes, and functions
-- **Error Handling**: Graceful error handling with meaningful messages
-- **PEP 8**: Code formatted with Black and linted with Ruff
-
 ### Running Code Quality Checks
 
 ```bash
@@ -530,6 +599,46 @@ ruff check .
 mypy graphs/
 ```
 
+### CI/CD Pipeline
+
+The project includes automated CI/CD workflows:
+
+- **GitHub Actions**: Automated testing and code quality checks on every push/PR
+- **Pre-commit Hooks**: Local code quality enforcement before commits
+- **Dependabot**: Automated weekly dependency updates
+
+#### Setting Up Pre-commit Hooks
+
+Install pre-commit hooks for local development:
+
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Install git hooks
+pre-commit install
+
+# Run manually on all files
+pre-commit run --all-files
+```
+
+Pre-commit will automatically run Black, Ruff, and Mypy before each commit.
+
+#### Development Dependencies
+
+Install all development tools:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+This includes:
+- Code quality tools (black, ruff, mypy)
+- Pre-commit hooks
+- Type stubs
+
+See **[docs/CI_CD_SETUP.md](docs/CI_CD_SETUP.md)** for complete CI/CD documentation.
+
 ### Adding New Graphs
 
 See `docs/MAINTENANCE_NOTES.md` for guidance on:
@@ -540,20 +649,32 @@ See `docs/MAINTENANCE_NOTES.md` for guidance on:
 
 ## Documentation
 
+- **[ARCHITECTURE_DESIGN.md](docs/ARCHITECTURE_DESIGN.md)**: Detailed architecture and design decisions
 - **[DEMO_GUIDE.md](docs/DEMO_GUIDE.md)**: Step-by-step walkthrough for demonstrating each graph
 - **[MAINTENANCE_NOTES.md](docs/MAINTENANCE_NOTES.md)**: Known limitations, technical debt, and future improvements
 - **[TESTING_RESULTS.md](docs/TESTING_RESULTS.md)**: Comprehensive test execution results
-- **[ARCHITECTURE_DESIGN.md](docs/ARCHITECTURE_DESIGN.md)**: Detailed architecture and design decisions
+- **[PERFORMANCE_BENCHMARKS.md](docs/PERFORMANCE_BENCHMARKS.md)**: Performance benchmarking guide and baseline metrics
+
 - **[TESTING_PLAN.md](docs/TESTING_PLAN.md)**: Testing strategy and scenarios
 
 ## License
 
-[Add your license information here]
+This project is licensed under the MIT License. See the project metadata in `pyproject.toml` for details.
 
 ## Contributing
 
-[Add contribution guidelines here]
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on:
+- Development setup
+- Code quality standards
+- Testing requirements
+- Pull request process
+- Code of conduct
 
 ## Acknowledgments
 
-Built with [LangGraph](https://github.com/langchain-ai/langgraph) and [LangChain](https://github.com/langchain-ai/langchain).
+This project was inspired by and built upon concepts from the [LangChain Academy](https://academy.langchain.com/) courses, which provide excellent educational resources for learning LangGraph and multi-agent systems.
+
+Special thanks to:
+- **Lance Martin** for the Task Maistro graph implementation, which demonstrates production-ready memory management patterns with Trustcall integration
+- The **LangChain team** for developing and maintaining [LangGraph](https://github.com/langchain-ai/langgraph) and [LangChain](https://github.com/langchain-ai/langchain)
+- The **LangChain Academy** for providing comprehensive courses on LangGraph patterns and best practices

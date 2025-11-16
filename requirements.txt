@@ -1,36 +1,27 @@
-# Core LangGraph Dependencies (Updated Nov 5, 2025)
+# Core LangGraph Dependencies
 langgraph==1.0.2
-langgraph-prebuilt==1.0.2
-langgraph-sdk==0.2.9
-langgraph-checkpoint==3.0.1
-langgraph-checkpoint-sqlite==3.0.0
-langgraph-api==0.5.4
-langgraph-runtime-inmem==0.16.0
+langgraph-checkpoint==2.1.2
+langgraph-checkpoint-sqlite==2.0.11
 langsmith==0.4.34
 
-# LangChain Core Dependencies (Updated Nov 5, 2025)
+# LangChain Core Dependencies
 langchain==1.0.3
 langchain-core==1.0.3
 langchain-community==0.3.31
 langchain-openai==1.0.2
-langchain-anthropic==1.0.1
 
-# Specialized Dependencies
+# Specialized Dependencies for Graphs
 tavily-python==0.7.12
+langchain-tavily==0.2.13
 wikipedia==1.4.0
 trustcall==0.0.39
+html2text==2025.4.15
 
-# Development Dependencies
-pytest==8.3.4
-pytest-cov==6.0.0
-black==24.10.0
-ruff==0.8.4
-mypy==1.13.0
-
-# Utilities
+# Development and Testing Dependencies
+pytest==8.4.2
+pytest-asyncio==0.24.0
+pytest-benchmark==5.1.0
 python-dotenv==1.1.1
-notebook==7.4.7
-html2text==2024.2.26
 
 # CLI Tools
 langgraph-cli==0.4.3

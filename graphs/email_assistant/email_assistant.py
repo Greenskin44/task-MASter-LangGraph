@@ -32,7 +32,12 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.types import Command
 from dotenv import load_dotenv
 
+from graphs.utils import get_logger, retry_with_backoff, create_api_error
+
 load_dotenv(".env")
+
+# Initialize logger for this module
+logger = get_logger(__name__)
 
 # Get tools
 tools = get_tools()
@@ -48,6 +53,7 @@ llm_with_tools = llm.bind_tools(tools, tool_choice="any")
 
 
 # Nodes
+@retry_with_backoff(max_retries=2, initial_delay=1.0)
 def llm_call(state: State) -> Dict[str, Any]:
     """LLM decides whether to call a tool or not.
 
@@ -60,33 +66,43 @@ def llm_call(state: State) -> Dict[str, Any]:
     Raises:
         ValueError: If messages are missing from state.
     """
+    logger.info("Processing LLM call for email assistant")
+    
     try:
         # Validate required state fields
         if not state.get("messages"):
+            logger.error("LLM call failed: missing messages in state")
             raise ValueError("Messages are required in state")
+        
+        logger.debug(f"Processing {len(state['messages'])} messages")
 
-        return {
-            "messages": [
-                llm_with_tools.invoke(
-                    [
-                        {
-                            "role": "system",
-                            "content": agent_system_prompt.format(
-                                tools_prompt=AGENT_TOOLS_PROMPT,
-                                background=default_background,
-                                response_preferences=default_response_preferences,
-                                cal_preferences=default_cal_preferences,
-                            ),
-                        },
-                    ]
-                    + state["messages"]
-                )
+        response = llm_with_tools.invoke(
+            [
+                {
+                    "role": "system",
+                    "content": agent_system_prompt.format(
+                        tools_prompt=AGENT_TOOLS_PROMPT,
+                        background=default_background,
+                        response_preferences=default_response_preferences,
+                        cal_preferences=default_cal_preferences,
+                    ),
+                },
             ]
-        }
+            + state["messages"]
+        )
+        
+        logger.info("LLM call completed successfully")
+        
+        return {"messages": [response]}
+        
+    except ValueError as e:
+        # Re-raise validation errors
+        raise
     except Exception as e:
-        # Return error message
-        error_msg = f"LLM call failed: {str(e)}"
-        return {"messages": [{"role": "assistant", "content": error_msg}]}
+        # Create detailed error
+        api_error = create_api_error("process email with LLM", e, "OpenAI")
+        logger.error(f"LLM call failed: {api_error}")
+        return {"messages": [{"role": "assistant", "content": str(api_error)}]}
 
 
 def tool_node(state: State) -> Dict[str, Any]:
@@ -99,14 +115,23 @@ def tool_node(state: State) -> Dict[str, Any]:
         Dictionary with tool execution results.
     """
     result = []
+    logger.info("Executing tool calls")
+    
     try:
         # Validate that we have messages with tool calls
         if not state.get("messages") or not state["messages"][-1].tool_calls:
+            logger.error("Tool node failed: no tool calls found in messages")
             raise ValueError("No tool calls found in messages")
+        
+        tool_calls = state["messages"][-1].tool_calls
+        logger.debug(f"Processing {len(tool_calls)} tool calls")
 
-        for tool_call in state["messages"][-1].tool_calls:
+        for tool_call in tool_calls:
+            tool_name = tool_call["name"]
+            logger.info(f"Executing tool: {tool_name}")
+            
             try:
-                tool = tools_by_name[tool_call["name"]]
+                tool = tools_by_name[tool_name]
                 observation = tool.invoke(tool_call["args"])
                 result.append(
                     {
@@ -115,8 +140,11 @@ def tool_node(state: State) -> Dict[str, Any]:
                         "tool_call_id": tool_call["id"],
                     }
                 )
+                logger.info(f"Tool {tool_name} executed successfully")
+                
             except KeyError:
-                error_msg = f"Tool '{tool_call['name']}' not found"
+                error_msg = f"Tool '{tool_name}' not found. Available tools: {', '.join(tools_by_name.keys())}"
+                logger.error(error_msg)
                 result.append(
                     {
                         "role": "tool",
@@ -125,7 +153,8 @@ def tool_node(state: State) -> Dict[str, Any]:
                     }
                 )
             except Exception as e:
-                error_msg = f"Tool execution failed: {str(e)}"
+                error_msg = f"Tool '{tool_name}' execution failed: {str(e)}"
+                logger.error(error_msg)
                 result.append(
                     {
                         "role": "tool",
@@ -139,6 +168,7 @@ def tool_node(state: State) -> Dict[str, Any]:
     except Exception as e:
         # Return error message
         error_msg = f"Tool node failed: {str(e)}"
+        logger.error(error_msg)
         return {"messages": [{"role": "assistant", "content": error_msg}]}
 
 
@@ -186,6 +216,7 @@ agent_builder.add_edge("environment", "llm_call")
 agent = agent_builder.compile()
 
 
+@retry_with_backoff(max_retries=2, initial_delay=1.0)
 def triage_router(state: State) -> Command[Literal["response_agent", "__end__"]]:
     """Analyze email content to decide if we should respond, notify, or ignore.
 
@@ -194,60 +225,75 @@ def triage_router(state: State) -> Command[Literal["response_agent", "__end__"]]
     - Company-wide announcements
     - Messages meant for other teams
     """
-    author, to, subject, email_thread = parse_email(state["email_input"])
-    system_prompt = triage_system_prompt.format(
-        background=default_background, triage_instructions=default_triage_instructions
-    )
+    try:
+        logger.info("Starting email triage")
+        
+        author, to, subject, email_thread = parse_email(state["email_input"])
+        subject_preview = subject[:50] if subject else "No subject"
+        logger.debug(f"Triaging email from {author} with subject: {subject_preview}")
+        
+        system_prompt = triage_system_prompt.format(
+            background=default_background, triage_instructions=default_triage_instructions
+        )
 
-    user_prompt = triage_user_prompt.format(
-        author=author, to=to, subject=subject, email_thread=email_thread
-    )
+        user_prompt = triage_user_prompt.format(
+            author=author, to=to, subject=subject, email_thread=email_thread
+        )
 
-    # Create email markdown for Agent Inbox in case of notification
-    email_markdown = format_email_markdown(subject, author, to, email_thread)
+        # Create email markdown for Agent Inbox in case of notification
+        email_markdown = format_email_markdown(subject, author, to, email_thread)
 
-    # Run the router LLM
-    result = llm_router.invoke(
-        [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ]
-    )
+        # Run the router LLM
+        result = llm_router.invoke(
+            [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ]
+        )
 
-    # Decision
-    classification = result.classification
+        # Decision
+        classification = result.classification
+        logger.info(f"Email classified as: {classification}")
 
-    if classification == "respond":
-        print("📧 Classification: RESPOND - This email requires a response")
-        goto = "response_agent"
-        # Add the email to the messages
-        update = {
-            "classification_decision": result.classification,
-            "messages": [
-                {"role": "user", "content": f"Respond to the email: {email_markdown}"}
-            ],
-        }
-    elif result.classification == "ignore":
-        print("🚫 Classification: IGNORE - This email can be safely ignored")
-        update = {
-            "classification_decision": result.classification,
-        }
-        goto = END
-    elif result.classification == "notify":
-        # If real life, this would do something else
-        print("🔔 Classification: NOTIFY - This email contains important information")
-        update = {
-            "classification_decision": result.classification,
-        }
-        goto = END
-    else:
-        raise ValueError(f"Invalid classification: {result.classification}")
-    return Command(goto=goto, update=update)
+        if classification == "respond":
+            print("📧 Classification: RESPOND - This email requires a response")
+            goto = "response_agent"
+            # Add the email to the messages
+            update = {
+                "classification_decision": result.classification,
+                "messages": [
+                    {"role": "user", "content": f"Respond to the email: {email_markdown}"}
+                ],
+            }
+        elif result.classification == "ignore":
+            print("🚫 Classification: IGNORE - This email can be safely ignored")
+            update = {
+                "classification_decision": result.classification,
+            }
+            goto = END
+        elif result.classification == "notify":
+            # If real life, this would do something else
+            print("🔔 Classification: NOTIFY - This email contains important information")
+            update = {
+                "classification_decision": result.classification,
+            }
+            goto = END
+        else:
+            error_msg = f"Invalid classification: {result.classification}"
+            logger.error(error_msg)
+            raise ValueError(error_msg)
+            
+        return Command(goto=goto, update=update)
+        
+    except Exception as e:
+        api_error = create_api_error("triage email", e, "OpenAI")
+        logger.error(f"Email triage failed: {api_error}")
+        raise
 
 
 # Build workflow
 overall_workflow = (
-    StateGraph(State, input=StateInput)
+    StateGraph(State, input_schema=StateInput)
     .add_node(triage_router)
     .add_node("response_agent", agent)
     .add_edge(START, "triage_router")

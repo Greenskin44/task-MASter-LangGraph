@@ -17,11 +17,16 @@ from langchain_core.documents import Document
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 
 from langchain_community.document_loaders import WikipediaLoader
-from langchain_community.tools import TavilySearchResults
+from langchain_tavily import TavilySearch
 
 from langchain_openai import ChatOpenAI
 
 from langgraph.graph import StateGraph, START, END
+
+from graphs.utils import get_logger, retry_with_backoff, create_api_error
+
+# Initialize logger for this module
+logger = get_logger(__name__)
 
 llm = ChatOpenAI(model="gpt-4o", temperature=0)
 
@@ -40,11 +45,13 @@ class State(TypedDict):
     context: Annotated[list, operator.add]
 
 
+@retry_with_backoff(max_retries=3, initial_delay=1.0)
 def search_web(state: State) -> Dict[str, Any]:
     """Retrieve documents from web search using Tavily.
 
     Performs a web search for the question and formats the results
-    as structured documents with URLs and content.
+    as structured documents with URLs and content. Includes retry logic
+    for transient failures.
 
     Args:
         state: Current graph state containing the question.
@@ -55,14 +62,19 @@ def search_web(state: State) -> Dict[str, Any]:
     Raises:
         ValueError: If question is missing from state.
     """
+    logger.info("Starting web search", extra={"question": state.get("question", "")[:50]})
+    
     try:
         # Validate required state fields
         if not state.get("question"):
+            logger.error("Web search failed: missing question in state")
             raise ValueError("Question is required in state")
 
         # Search
-        tavily_search = TavilySearchResults(max_results=3)
+        tavily_search = TavilySearch(max_results=3)
         search_docs = tavily_search.invoke(state["question"])
+        
+        logger.info(f"Web search completed successfully, found {len(search_docs)} results")
 
         # Format
         formatted_search_docs = "\n\n---\n\n".join(
@@ -74,17 +86,23 @@ def search_web(state: State) -> Dict[str, Any]:
 
         return {"context": [formatted_search_docs]}
 
+    except ValueError as e:
+        # Re-raise validation errors without retry
+        raise
     except Exception as e:
-        # Return error context instead of failing
-        error_msg = f"Web search failed: {str(e)}"
-        return {"context": [f"<Error>{error_msg}</Error>"]}
+        # Create detailed error with troubleshooting hints
+        api_error = create_api_error("perform web search", e, "Tavily")
+        logger.error(f"Web search failed: {api_error}")
+        # Return error context instead of failing the entire graph
+        return {"context": [f"<Error>{str(api_error)}</Error>"]}
 
 
+@retry_with_backoff(max_retries=3, initial_delay=1.0)
 def search_wikipedia(state: State) -> Dict[str, Any]:
     """Retrieve documents from Wikipedia.
 
     Searches Wikipedia for articles related to the question and formats
-    the results with source metadata.
+    the results with source metadata. Includes retry logic for transient failures.
 
     Args:
         state: Current graph state containing the question.
@@ -95,13 +113,18 @@ def search_wikipedia(state: State) -> Dict[str, Any]:
     Raises:
         ValueError: If question is missing from state.
     """
+    logger.info("Starting Wikipedia search", extra={"question": state.get("question", "")[:50]})
+    
     try:
         # Validate required state fields
         if not state.get("question"):
+            logger.error("Wikipedia search failed: missing question in state")
             raise ValueError("Question is required in state")
 
         # Search
         search_docs = WikipediaLoader(query=state["question"], load_max_docs=2).load()
+        
+        logger.info(f"Wikipedia search completed successfully, found {len(search_docs)} documents")
 
         # Format
         formatted_search_docs = "\n\n---\n\n".join(
@@ -113,17 +136,24 @@ def search_wikipedia(state: State) -> Dict[str, Any]:
 
         return {"context": [formatted_search_docs]}
 
+    except ValueError as e:
+        # Re-raise validation errors without retry
+        raise
     except Exception as e:
-        # Return error context instead of failing
-        error_msg = f"Wikipedia search failed: {str(e)}"
-        return {"context": [f"<Error>{error_msg}</Error>"]}
+        # Create detailed error with troubleshooting hints
+        api_error = create_api_error("search Wikipedia", e, "Wikipedia")
+        logger.error(f"Wikipedia search failed: {api_error}")
+        # Return error context instead of failing the entire graph
+        return {"context": [f"<Error>{str(api_error)}</Error>"]}
 
 
+@retry_with_backoff(max_retries=3, initial_delay=1.0)
 def generate_answer(state: State) -> Dict[str, Any]:
     """Generate an answer based on accumulated search context.
 
     Uses the LLM to synthesize information from web and Wikipedia searches
-    into a coherent answer to the user's question.
+    into a coherent answer to the user's question. Includes retry logic
+    for LLM API failures.
 
     Args:
         state: Current graph state with question and accumulated context.
@@ -134,16 +164,22 @@ def generate_answer(state: State) -> Dict[str, Any]:
     Raises:
         ValueError: If required state fields are missing.
     """
+    logger.info("Starting answer generation")
+    
     try:
         # Validate required state fields
         if not state.get("question"):
+            logger.error("Answer generation failed: missing question in state")
             raise ValueError("Question is required in state")
         if not state.get("context"):
+            logger.error("Answer generation failed: missing context in state")
             raise ValueError("Context is required in state")
 
         # Get state
         context = state["context"]
         question = state["question"]
+        
+        logger.debug(f"Generating answer with {len(context)} context items")
 
         # Template
         answer_template = (
@@ -156,14 +192,21 @@ def generate_answer(state: State) -> Dict[str, Any]:
             [SystemMessage(content=answer_instructions)]
             + [HumanMessage(content=f"Answer the question.")]
         )
+        
+        logger.info("Answer generated successfully")
 
         # Append it to state
         return {"answer": answer}
 
+    except ValueError as e:
+        # Re-raise validation errors without retry
+        raise
     except Exception as e:
+        # Create detailed error with troubleshooting hints
+        api_error = create_api_error("generate answer", e, "OpenAI")
+        logger.error(f"Answer generation failed: {api_error}")
         # Return error message as answer
-        error_msg = f"Failed to generate answer: {str(e)}"
-        return {"answer": AIMessage(content=error_msg)}
+        return {"answer": AIMessage(content=str(api_error))}
 
 
 # Add nodes
