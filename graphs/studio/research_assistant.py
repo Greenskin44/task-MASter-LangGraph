@@ -4,7 +4,7 @@ from typing import Annotated, List
 from typing_extensions import TypedDict
 
 from langchain_community.document_loaders import WikipediaLoader
-from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_tavily import TavilySearch
 from langchain_core.messages import (
     AIMessage,
     HumanMessage,
@@ -13,7 +13,7 @@ from langchain_core.messages import (
 )
 from langchain_openai import ChatOpenAI
 
-from langgraph.constants import Send
+from langgraph.types import Send
 from langgraph.graph import END, MessagesState, START, StateGraph
 
 ### LLM
@@ -180,7 +180,7 @@ def search_web(state: InterviewState):
     """Retrieve docs from web search"""
 
     # Search
-    tavily_search = TavilySearchResults(max_results=3)
+    tavily_search = TavilySearch(max_results=3)
 
     # Search query
     structured_llm = llm.with_structured_output(SearchQuery)

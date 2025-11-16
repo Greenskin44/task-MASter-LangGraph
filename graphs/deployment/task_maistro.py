@@ -37,6 +37,10 @@ from langgraph.store.base import BaseStore
 from langgraph.store.memory import InMemoryStore
 
 from graphs.deployment import configuration
+from graphs.utils import get_logger, retry_with_backoff, create_api_error
+
+# Initialize logger for this module
+logger = get_logger(__name__)
 
 ## Utilities
 
@@ -180,7 +184,7 @@ class ToDo(BaseModel):
     )
     solutions: list[str] = Field(
         description="List of specific, actionable solutions (e.g., specific ideas, service providers, or concrete options relevant to completing the task)",
-        min_items=1,
+        min_length=1,
         default_factory=list,
     )
     status: Literal["not started", "in progress", "done", "archived"] = Field(
@@ -274,6 +278,7 @@ Your current instructions are:
 ## Node definitions
 
 
+@retry_with_backoff(max_retries=2, initial_delay=1.0)
 def task_mAIstro(
     state: MessagesState, config: RunnableConfig, store: BaseStore
 ) -> Dict[str, Any]:
@@ -291,108 +296,135 @@ def task_mAIstro(
     Returns:
         Dictionary with the chatbot's response message.
     """
+    try:
+        # Get the user ID from the config
+        configurable = configuration.Configuration.from_runnable_config(config)
+        user_id = configurable.user_id
+        todo_category = configurable.todo_category
+        task_maistro_role = configurable.task_maistro_role
+        
+        logger.info(f"Processing request for user: {user_id}, category: {todo_category}")
 
-    # Get the user ID from the config
-    configurable = configuration.Configuration.from_runnable_config(config)
-    user_id = configurable.user_id
-    todo_category = configurable.todo_category
-    task_maistro_role = configurable.task_maistro_role
+        # Retrieve profile memory from the store
+        namespace = ("profile", todo_category, user_id)
+        memories = store.search(namespace)
+        if memories:
+            user_profile = memories[0].value
+            logger.debug(f"Loaded user profile for {user_id}")
+        else:
+            user_profile = None
+            logger.debug(f"No user profile found for {user_id}")
 
-    # Retrieve profile memory from the store
-    namespace = ("profile", todo_category, user_id)
-    memories = store.search(namespace)
-    if memories:
-        user_profile = memories[0].value
-    else:
-        user_profile = None
+        # Retrieve people memory from the store
+        namespace = ("todo", todo_category, user_id)
+        memories = store.search(namespace)
+        todo = "\n".join(f"{mem.value}" for mem in memories)
+        logger.debug(f"Loaded {len(memories)} todo items for {user_id}")
 
-    # Retrieve people memory from the store
-    namespace = ("todo", todo_category, user_id)
-    memories = store.search(namespace)
-    todo = "\n".join(f"{mem.value}" for mem in memories)
+        # Retrieve custom instructions
+        namespace = ("instructions", todo_category, user_id)
+        memories = store.search(namespace)
+        if memories:
+            instructions = memories[0].value
+            logger.debug(f"Loaded custom instructions for {user_id}")
+        else:
+            instructions = ""
+            logger.debug(f"No custom instructions found for {user_id}")
 
-    # Retrieve custom instructions
-    namespace = ("instructions", todo_category, user_id)
-    memories = store.search(namespace)
-    if memories:
-        instructions = memories[0].value
-    else:
-        instructions = ""
+        system_msg = MODEL_SYSTEM_MESSAGE.format(
+            task_maistro_role=task_maistro_role,
+            user_profile=user_profile,
+            todo=todo,
+            instructions=instructions,
+        )
 
-    system_msg = MODEL_SYSTEM_MESSAGE.format(
-        task_maistro_role=task_maistro_role,
-        user_profile=user_profile,
-        todo=todo,
-        instructions=instructions,
-    )
+        # Respond using memory as well as the chat history
+        response = model.bind_tools([UpdateMemory], parallel_tool_calls=False).invoke(
+            [SystemMessage(content=system_msg)] + state["messages"]
+        )
+        
+        logger.info("Successfully generated response")
 
-    # Respond using memory as well as the chat history
-    response = model.bind_tools([UpdateMemory], parallel_tool_calls=False).invoke(
-        [SystemMessage(content=system_msg)] + state["messages"]
-    )
+        return {"messages": [response]}
+        
+    except Exception as e:
+        api_error = create_api_error("process task maistro request", e, "OpenAI")
+        logger.error(f"Task maistro failed: {api_error}")
+        raise
 
-    return {"messages": [response]}
 
-
+@retry_with_backoff(max_retries=2, initial_delay=1.0)
 def update_profile(state: MessagesState, config: RunnableConfig, store: BaseStore):
     """Reflect on the chat history and update the memory collection."""
+    
+    try:
+        # Get the user ID from the config
+        configurable = configuration.Configuration.from_runnable_config(config)
+        user_id = configurable.user_id
+        todo_category = configurable.todo_category
+        
+        logger.info(f"Updating profile for user: {user_id}")
 
-    # Get the user ID from the config
-    configurable = configuration.Configuration.from_runnable_config(config)
-    user_id = configurable.user_id
-    todo_category = configurable.todo_category
+        # Define the namespace for the memories
+        namespace = ("profile", todo_category, user_id)
 
-    # Define the namespace for the memories
-    namespace = ("profile", todo_category, user_id)
+        # Retrieve the most recent memories for context
+        existing_items = store.search(namespace)
+        logger.debug(f"Found {len(existing_items)} existing profile items")
 
-    # Retrieve the most recent memories for context
-    existing_items = store.search(namespace)
-
-    # Format the existing memories for the Trustcall extractor
-    tool_name = "Profile"
-    existing_memories = (
-        [
-            (existing_item.key, tool_name, existing_item.value)
-            for existing_item in existing_items
-        ]
-        if existing_items
-        else None
-    )
-
-    # Merge the chat history and the instruction
-    TRUSTCALL_INSTRUCTION_FORMATTED = TRUSTCALL_INSTRUCTION.format(
-        time=datetime.now().isoformat()
-    )
-    updated_messages = list(
-        merge_message_runs(
-            messages=[SystemMessage(content=TRUSTCALL_INSTRUCTION_FORMATTED)]
-            + state["messages"][:-1]
+        # Format the existing memories for the Trustcall extractor
+        tool_name = "Profile"
+        existing_memories = (
+            [
+                (existing_item.key, tool_name, existing_item.value)
+                for existing_item in existing_items
+            ]
+            if existing_items
+            else None
         )
-    )
 
-    # Invoke the extractor
-    result = profile_extractor.invoke(
-        {"messages": updated_messages, "existing": existing_memories}
-    )
-
-    # Save save the memories from Trustcall to the store
-    for r, rmeta in zip(result["responses"], result["response_metadata"]):
-        store.put(
-            namespace,
-            rmeta.get("json_doc_id", str(uuid.uuid4())),
-            r.model_dump(mode="json"),
+        # Merge the chat history and the instruction
+        TRUSTCALL_INSTRUCTION_FORMATTED = TRUSTCALL_INSTRUCTION.format(
+            time=datetime.now().isoformat()
         )
-    tool_calls = state["messages"][-1].tool_calls
-    # Return tool message with update verification
-    return {
-        "messages": [
-            {
-                "role": "tool",
-                "content": "updated profile",
-                "tool_call_id": tool_calls[0]["id"],
-            }
-        ]
-    }
+        updated_messages = list(
+            merge_message_runs(
+                messages=[SystemMessage(content=TRUSTCALL_INSTRUCTION_FORMATTED)]
+                + state["messages"][:-1]
+            )
+        )
+
+        # Invoke the extractor
+        result = profile_extractor.invoke(
+            {"messages": updated_messages, "existing": existing_memories}
+        )
+
+        # Save save the memories from Trustcall to the store
+        for r, rmeta in zip(result["responses"], result["response_metadata"]):
+            store.put(
+                namespace,
+                rmeta.get("json_doc_id", str(uuid.uuid4())),
+                r.model_dump(mode="json"),
+            )
+        
+        logger.info(f"Profile updated successfully for user: {user_id}")
+        
+        tool_calls = state["messages"][-1].tool_calls
+        # Return tool message with update verification
+        return {
+            "messages": [
+                {
+                    "role": "tool",
+                    "content": "updated profile",
+                    "tool_call_id": tool_calls[0]["id"],
+                }
+            ]
+        }
+        
+    except Exception as e:
+        api_error = create_api_error("update profile", e, "Trustcall")
+        logger.error(f"Profile update failed: {api_error}")
+        raise
 
 
 def update_todos(state: MessagesState, config: RunnableConfig, store: BaseStore):
@@ -531,7 +563,7 @@ def route_message(
 
 
 # Create the graph + all nodes
-builder = StateGraph(MessagesState, config_schema=configuration.Configuration)
+builder = StateGraph(MessagesState, context_schema=configuration.Configuration)
 
 # Define the flow of the memory extraction process
 builder.add_node(task_mAIstro)

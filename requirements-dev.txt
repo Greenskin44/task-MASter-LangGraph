@@ -1,0 +1,19 @@
+# Development and CI/CD Dependencies
+# Install with: pip install -r requirements-dev.txt
+
+# Include base requirements
+-r requirements.txt
+
+# Code Quality Tools
+black==24.10.0
+ruff==0.8.4
+mypy==1.13.0
+
+# Pre-commit Hooks
+pre-commit==4.0.1
+
+# Security Tools
+bandit[toml]==1.8.0
+
+# Type Stubs
+types-requests==2.32.0.20241016

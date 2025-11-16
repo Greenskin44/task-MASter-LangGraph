@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 
 from langchain_openai import ChatOpenAI
 
-from langgraph.constants import Send
+from langgraph.types import Send
 from langgraph.graph import END, StateGraph, START
 
 # Prompts we will use

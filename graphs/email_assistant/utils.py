@@ -111,15 +111,18 @@ Arguments:"""
     return display
 
 
-def parse_email(email_input: dict) -> dict:
-    """Parse an email input dictionary.
+def parse_email(email_input):
+    """Parse an email input (dictionary or string).
 
     Args:
-        email_input (dict): Dictionary containing email fields:
+        email_input: Either a dictionary containing email fields or a raw email string:
+            Dictionary fields:
             - author or from_email: Sender's name and email
             - to or to_email: Recipient's name and email
             - subject: Email subject line
             - email_thread or page_content: Full email content
+            
+            String format: Raw email text with From:, To:, Subject: headers
 
     Returns:
         tuple[str, str, str, str]: Tuple containing:
@@ -128,6 +131,34 @@ def parse_email(email_input: dict) -> dict:
             - subject: Email subject line
             - email_thread: Full email content
     """
+    # Handle string input (raw email text)
+    if isinstance(email_input, str):
+        lines = email_input.strip().split('\n')
+        author = None
+        to = None
+        subject = None
+        email_thread_lines = []
+        
+        # Parse headers
+        in_body = False
+        for line in lines:
+            if not in_body:
+                if line.startswith('From:'):
+                    author = line[5:].strip()
+                elif line.startswith('To:'):
+                    to = line[3:].strip()
+                elif line.startswith('Subject:'):
+                    subject = line[8:].strip()
+                elif line.strip() == '':
+                    # Empty line marks end of headers
+                    in_body = True
+            else:
+                email_thread_lines.append(line)
+        
+        email_thread = '\n'.join(email_thread_lines).strip()
+        return (author, to, subject, email_thread)
+    
+    # Handle dictionary input
     # Support both 'author' and 'from_email' field names
     author = email_input.get("author") or email_input.get("from_email")
     # Support both 'to' and 'to_email' field names

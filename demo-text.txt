@@ -1,52 +1,25 @@
 # LangGraph Demo Examples
 
-This file contains copy-paste ready examples for demonstrating all LangGraph implementations.
-Each example is designed to work without modification in LangGraph Studio.
+Copy-paste ready examples for all graphs in LangGraph Studio.
 
 ---
 
 ## STUDIO GRAPHS
 
-These graphs demonstrate core LangGraph patterns and are ideal for learning and showcasing capabilities.
+### Parallelization: Web + Wikipedia Search
+Demonstrates parallel execution by simultaneously searching web (Tavily) and Wikipedia.
 
-### 1. Parallelization: Web + Wikipedia Search
-
-**Description:** Demonstrates parallel execution by simultaneously searching the web (Tavily) and Wikipedia, then synthesizing results into a coherent answer.
-
-**Example 1: Simple Technology Question**
 ```json
 {
   "question": "What is LangGraph?"
 }
 ```
 
-**Expected Output:** A comprehensive answer combining web search results and Wikipedia content about LangGraph, its purpose, and key features.
-
-**Example 2: Technical Concept**
-```json
-{
-  "question": "How does parallel execution work in distributed systems?"
-}
-```
-
-**Expected Output:** An answer synthesizing information from multiple sources about parallel execution patterns, benefits, and implementation approaches.
-
-**Example 3: Current Events**
-```json
-{
-  "question": "What are the latest developments in large language models?"
-}
-```
-
-**Expected Output:** Recent information from web searches combined with foundational knowledge from Wikipedia about LLM advancements.
-
 ---
 
-### 2. Sub-Graphs: Log Analysis
+### Sub-Graphs: Log Analysis
+Demonstrates nested graph composition with parallel sub-graphs analyzing failures and summarizing questions.
 
-**Description:** Demonstrates nested graph composition with two parallel sub-graphs that analyze logs for failures and summarize questions.
-
-**Example 1: Basic Logs with Failures**
 ```json
 {
   "raw_logs": [
@@ -78,91 +51,22 @@ These graphs demonstrate core LangGraph patterns and are ideal for learning and 
 }
 ```
 
-**Expected Output:** 
-- `fa_summary`: Analysis of failure patterns in graded logs
-- `report`: Summary of question themes and topics
-- `processed_logs`: List of processed log IDs from both sub-graphs
-
-**Example 2: Logs Without Failures**
-```json
-{
-  "raw_logs": [
-    {
-      "id": "10",
-      "question": "What is LangChain?",
-      "docs": ["doc10"],
-      "answer": "LangChain is a framework for developing applications powered by language models..."
-    },
-    {
-      "id": "11",
-      "question": "How to use LCEL?",
-      "docs": ["doc11", "doc12"],
-      "answer": "LCEL (LangChain Expression Language) provides a declarative way to compose chains..."
-    },
-    {
-      "id": "12",
-      "question": "What are LangGraph nodes?",
-      "docs": ["doc13"],
-      "answer": "Nodes in LangGraph represent individual steps in a workflow..."
-    }
-  ]
-}
-```
-
-**Expected Output:**
-- `fa_summary`: No failures detected (empty failure list)
-- `report`: Summary focusing on LangChain ecosystem questions
-- `processed_logs`: All log IDs processed
-
 ---
 
-### 3. Map-Reduce: Joke Generation
+### Map-Reduce: Joke Generation
+Demonstrates map-reduce pattern using Send() API to generate and select the best joke.
 
-**Description:** Demonstrates the map-reduce pattern using Send() API to generate jokes about sub-topics and select the best one.
-
-**Example 1: Technology Topic**
 ```json
 {
   "topic": "artificial intelligence"
 }
 ```
 
-**Expected Output:** 
-- Generates 3 sub-topics related to AI
-- Creates a joke for each sub-topic
-- Selects and returns the best joke
-
-**Example 2: Science Topic**
-```json
-{
-  "topic": "quantum computing"
-}
-```
-
-**Expected Output:**
-- Generates 3 quantum computing sub-topics
-- Creates jokes about each sub-topic
-- Returns the funniest joke based on LLM evaluation
-
-**Example 3: Everyday Topic**
-```json
-{
-  "topic": "coffee"
-}
-```
-
-**Expected Output:**
-- Generates 3 coffee-related sub-topics (brewing, beans, culture, etc.)
-- Creates jokes for each
-- Selects the best joke
-
 ---
 
-### 4. Research Assistant: Multi-Agent Research
+### Research Assistant: Multi-Agent Research
+Multi-agent collaboration with analyst personas conducting parallel interviews and synthesizing reports.
 
-**Description:** Demonstrates multi-agent collaboration with analyst personas conducting parallel interviews and synthesizing a comprehensive research report.
-
-**Example 1: Technology Research (Minimal)**
 ```json
 {
   "topic": "LangGraph architecture patterns",
@@ -171,53 +75,14 @@ These graphs demonstrate core LangGraph patterns and are ideal for learning and 
 }
 ```
 
-**Expected Output:**
-- Creates 2 analyst personas with different perspectives
-- Each analyst conducts an interview with web/Wikipedia searches
-- Generates introduction, insights section, conclusion, and sources
-- Returns a comprehensive final report
-
-**Example 2: Technology Research (With Feedback)**
-```json
-{
-  "topic": "AI safety and alignment",
-  "max_analysts": 3,
-  "human_analyst_feedback": "Focus on technical approaches and current research, not philosophical debates"
-}
-```
-
-**Expected Output:**
-- Creates 3 analyst personas aligned with the feedback
-- Conducts parallel interviews focusing on technical aspects
-- Synthesizes findings into a cohesive report
-- Includes citations from sources
-
-**Example 3: Practical Application Research**
-```json
-{
-  "topic": "production deployment of LangGraph applications",
-  "max_analysts": 2,
-  "human_analyst_feedback": "approve"
-}
-```
-
-**Expected Output:**
-- Creates 2 analysts (e.g., DevOps perspective, Architecture perspective)
-- Gathers information about deployment strategies
-- Produces a structured report with practical insights
-- Includes relevant sources and citations
-
 ---
 
 ## DEPLOYMENT GRAPHS
 
-These graphs are production-ready implementations for real-world use cases.
-
 ### Task Maistro: Personal Assistant with Memory
+Production-ready personal assistant with long-term memory across three namespaces: profile, todos, and instructions.
 
-**Description:** A production-ready personal assistant that maintains long-term memory across three namespaces: user profile, todo list, and custom instructions. Uses Trustcall for intelligent memory updates and supports multi-category organization.
-
-**Example 1: Profile Update**
+**Profile Update:**
 ```json
 {
   "messages": [
@@ -229,12 +94,7 @@ These graphs are production-ready implementations for real-world use cases.
 }
 ```
 
-**Expected Output:**
-- Profile memory updated with name, location, job, and interests
-- Natural response acknowledging the information
-- Memory persisted in the profile namespace
-
-**Configuration:**
+Configuration:
 ```json
 {
   "configurable": {
@@ -245,7 +105,7 @@ These graphs are production-ready implementations for real-world use cases.
 }
 ```
 
-**Example 2: Todo List Management**
+**Todo Management:**
 ```json
 {
   "messages": [
@@ -257,12 +117,7 @@ These graphs are production-ready implementations for real-world use cases.
 }
 ```
 
-**Expected Output:**
-- Two tasks added to todo list with deadlines
-- Confirmation message listing the added tasks
-- Tasks stored in todo namespace with status "not started"
-
-**Configuration:**
+Configuration:
 ```json
 {
   "configurable": {
@@ -273,129 +128,21 @@ These graphs are production-ready implementations for real-world use cases.
 }
 ```
 
-**Example 3: Custom Instructions Update**
-```json
-{
-  "messages": [
-    {
-      "role": "user",
-      "content": "When I add tasks, always estimate the time to complete and suggest at least 2 specific solutions or approaches for each task."
-    }
-  ]
-}
-```
-
-**Expected Output:**
-- Instructions memory updated with user preferences
-- Confirmation that preferences have been noted
-- Future tasks will follow these instructions
-
-**Configuration:**
-```json
-{
-  "configurable": {
-    "user_id": "user_123",
-    "todo_category": "personal",
-    "thread_id": "thread_003"
-  }
-}
-```
-
-**Example 4: Multi-Turn Conversation with Memory**
-```json
-{
-  "messages": [
-    {
-      "role": "user",
-      "content": "Add a task to buy groceries this weekend"
-    }
-  ]
-}
-```
-
-Then in a follow-up interaction:
-```json
-{
-  "messages": [
-    {
-      "role": "user",
-      "content": "What tasks do I have coming up?"
-    }
-  ]
-}
-```
-
-**Expected Output:**
-- First interaction: Task added to todo list
-- Second interaction: Assistant recalls the grocery task and any other tasks in memory
-- Demonstrates memory persistence across conversations
-
-**Configuration:**
-```json
-{
-  "configurable": {
-    "user_id": "user_123",
-    "todo_category": "personal",
-    "thread_id": "thread_004"
-  }
-}
-```
-
-**Example 5: Complex Task with Solutions**
-```json
-{
-  "messages": [
-    {
-      "role": "user",
-      "content": "I need to plan a team offsite event for 20 people next month. It should be fun and help with team bonding."
-    }
-  ]
-}
-```
-
-**Expected Output:**
-- Task added with estimated time to complete
-- Multiple specific solutions suggested (e.g., escape room venues, outdoor activities, workshop facilitators)
-- Task stored with deadline and actionable solutions
-- Confirmation message with the task details
-
-**Configuration:**
-```json
-{
-  "configurable": {
-    "user_id": "user_123",
-    "todo_category": "work",
-    "thread_id": "thread_005"
-  }
-}
-```
-
-**Notes:**
-- The `user_id` identifies the user across all conversations
-- The `todo_category` allows organizing tasks into different contexts (personal, work, etc.)
-- The `thread_id` maintains conversation continuity within a session
-- Profile updates happen silently without explicit confirmation to the user
-- Todo updates are confirmed with details of what was added or changed
-- Instructions updates are acknowledged but not detailed to the user
-
 ---
 
 ## EMAIL ASSISTANT
 
-These graphs demonstrate automated email triage and response generation for executive assistants.
-
 ### Email Assistant: Automated Email Triage and Response
+Intelligent email triage into three categories (respond, notify, ignore) with automated response drafting.
 
-**Description:** An intelligent email assistant that triages incoming emails into three categories (respond, notify, ignore) and automatically drafts responses for emails that require replies. Uses tool-based actions for calendar management and email composition.
-
-**Example 1: Meeting Request (RESPOND)**
+**Meeting Request (RESPOND):**
 ```json
 {
   "email_input": {
     "id": "email_001",
     "thread_id": "thread_001",
     "from_email": "sarah.johnson@techcorp.com",
-    "to_email": "lance@langchain.com",
+    "to_email": "greenskin44@gmail.com",
     "subject": "Quick sync on API documentation",
     "page_content": "Hi Lance,\n\nI hope this email finds you well. I wanted to reach out about the API documentation for the new LangChain endpoints. We're planning to integrate them into our product next week.\n\nCould we schedule a 30-minute call this week to discuss the authentication flow and rate limits? I'm available Tuesday afternoon or Thursday morning.\n\nLooking forward to hearing from you!\n\nBest regards,\nSarah Johnson\nSenior Engineer, TechCorp",
     "send_time": "2024-01-15T09:30:00Z"
@@ -403,43 +150,14 @@ These graphs demonstrate automated email triage and response generation for exec
 }
 ```
 
-**Expected Output:**
-- Classification: `respond`
-- Agent checks calendar availability for Tuesday afternoon and Thursday morning
-- Agent schedules meeting at available time slot
-- Agent drafts response email confirming the meeting and addressing the API documentation topic
-- Response includes meeting details and acknowledges the integration timeline
-
-**Example 2: Technical Question (RESPOND)**
-```json
-{
-  "email_input": {
-    "id": "email_002",
-    "thread_id": "thread_002",
-    "from_email": "mike.chen@startup.io",
-    "to_email": "lance@langchain.com",
-    "subject": "Question about LangGraph memory persistence",
-    "page_content": "Hey Lance,\n\nI've been working with LangGraph and have a question about memory persistence. I noticed the documentation mentions checkpoint-sqlite, but I'm wondering if there's support for PostgreSQL checkpointers in production environments.\n\nAlso, are there any best practices for handling long-running conversations with large state objects?\n\nThanks for your help!\n\nMike Chen\nCTO, Startup.io",
-    "send_time": "2024-01-15T14:20:00Z"
-  }
-}
-```
-
-**Expected Output:**
-- Classification: `respond`
-- Agent drafts response addressing the technical questions
-- Response mentions investigating PostgreSQL checkpointer support and provides timeline
-- Response includes guidance on best practices for state management
-- Professional and concise tone maintained
-
-**Example 3: Company Announcement (NOTIFY)**
+**Company Announcement (NOTIFY):**
 ```json
 {
   "email_input": {
     "id": "email_003",
     "thread_id": "thread_003",
-    "from_email": "hr@langchain.com",
-    "to_email": "engineering-all@langchain.com",
+    "from_email": "hr@techcorp.com",
+    "to_email": "greenskin44@gmail.com",
     "subject": "Reminder: Q1 Performance Reviews Due January 31st",
     "page_content": "Hi Team,\n\nThis is a friendly reminder that Q1 performance reviews are due by January 31st. Please ensure you complete your self-assessments and peer feedback forms in the HR portal.\n\nKey deadlines:\n- Self-assessments: January 25th\n- Peer feedback: January 28th\n- Manager reviews: January 31st\n\nIf you have any questions, please reach out to the HR team.\n\nBest,\nHR Department",
     "send_time": "2024-01-15T08:00:00Z"
@@ -447,170 +165,14 @@ These graphs demonstrate automated email triage and response generation for exec
 }
 ```
 
-**Expected Output:**
-- Classification: `notify`
-- No response drafted (notification only)
-- Important deadline information flagged for awareness
-- No further action taken by the agent
-
-**Example 4: Marketing Email (IGNORE)**
-```json
-{
-  "email_input": {
-    "id": "email_004",
-    "thread_id": "thread_004",
-    "from_email": "newsletter@techconference.com",
-    "to_email": "lance@langchain.com",
-    "subject": "🎉 Early Bird Discount: AI Summit 2024 - Register Now!",
-    "page_content": "Don't miss out on the biggest AI conference of the year!\n\nAI Summit 2024 is coming to San Francisco on March 15-17. Register now and save 30% with our early bird discount.\n\nFeatured speakers:\n- Dr. Jane Smith, AI Research Lead at BigTech\n- John Doe, CEO of AI Startup\n- And many more!\n\nTopics include:\n✓ Large Language Models\n✓ AI Safety and Ethics\n✓ Production ML Systems\n✓ AI in Healthcare\n\nUse code EARLYBIRD2024 at checkout.\n\nRegister now: https://techconference.com/register\n\nBest regards,\nThe AI Summit Team",
-    "send_time": "2024-01-15T06:00:00Z"
-  }
-}
-```
-
-**Expected Output:**
-- Classification: `ignore`
-- No response drafted
-- Email identified as marketing/promotional content
-- No further action taken by the agent
-
-**Example 5: Build Notification (NOTIFY)**
-```json
-{
-  "email_input": {
-    "id": "email_005",
-    "thread_id": "thread_005",
-    "from_email": "github-notifications@github.com",
-    "to_email": "lance@langchain.com",
-    "subject": "[langchain-ai/langgraph] Deployment successful: production (main)",
-    "page_content": "Deployment Status: ✅ Success\n\nRepository: langchain-ai/langgraph\nBranch: main\nCommit: a1b2c3d - Add memory persistence improvements\nEnvironment: production\nDeployed by: @lance\nDuration: 3m 42s\n\nView deployment: https://github.com/langchain-ai/langgraph/deployments/12345\n\nAll checks passed:\n✓ Unit tests (245 passed)\n✓ Integration tests (87 passed)\n✓ Type checking\n✓ Linting\n\nDeployment completed at 2024-01-15 10:15:23 UTC",
-    "send_time": "2024-01-15T10:15:30Z"
-  }
-}
-```
-
-**Expected Output:**
-- Classification: `notify`
-- No response drafted (notification only)
-- Important deployment information flagged for awareness
-- No further action taken by the agent
-
-**Example 6: Spam/Suspicious Email (IGNORE)**
-```json
-{
-  "email_input": {
-    "id": "email_006",
-    "thread_id": "thread_006",
-    "from_email": "urgent-action@suspicious-domain.xyz",
-    "to_email": "lance@langchain.com",
-    "subject": "URGENT: Your account will be suspended",
-    "page_content": "Dear User,\n\nYour account has been flagged for suspicious activity. To prevent suspension, you must verify your identity immediately by clicking the link below and entering your credentials.\n\nVerify Now: http://suspicious-link.xyz/verify\n\nFailure to verify within 24 hours will result in permanent account closure.\n\nSecurity Team",
-    "send_time": "2024-01-15T03:45:00Z"
-  }
-}
-```
-
-**Expected Output:**
-- Classification: `ignore`
-- No response drafted
-- Email identified as spam/suspicious
-- No further action taken by the agent
-
-**Notes:**
-- The email assistant uses a two-stage workflow: triage → response (if needed)
-- Triage classification is based on email content, sender, and configured rules
-- RESPOND: Emails requiring direct replies (questions, meeting requests, client inquiries)
-- NOTIFY: Important information worth knowing but not requiring a response (announcements, notifications, status updates)
-- IGNORE: Irrelevant emails (marketing, spam, FYI threads with no action items)
-- The response agent has access to tools for calendar management, email composition, and task completion
-- All responses follow configured preferences for tone, style, and content
-- The assistant can handle multi-turn interactions for complex email threads
-
 ---
 
 ## RESEARCH AGENT
 
-These graphs demonstrate deep research workflows with multi-agent coordination and comprehensive report generation.
-
 ### Deep Research Agent: Multi-Agent Research Workflow
+Comprehensive research system with clarification, research brief generation, multi-agent coordination, and report synthesis.
 
-**Description:** A comprehensive research system that clarifies user requirements, generates research briefs, coordinates multiple research agents, and synthesizes findings into detailed reports. The workflow includes user clarification, research brief generation, multi-agent supervisor coordination, and final report synthesis.
-
-**Example 1: Simple Research Topic (No Clarification Needed)**
-```json
-{
-  "messages": [
-    {
-      "role": "user",
-      "content": "I want to learn about LangGraph memory management and persistence strategies"
-    }
-  ]
-}
-```
-
-**Expected Output:**
-- System determines no clarification needed
-- Generates research brief focusing on LangGraph memory management
-- Supervisor coordinates research agents to gather information
-- Final report includes:
-  - Overview of LangGraph memory concepts
-  - Checkpoint persistence strategies
-  - Best practices for state management
-  - Code examples and implementation patterns
-  - Sources and citations
-
-**Example 2: Research Topic Requiring Clarification**
-```json
-{
-  "messages": [
-    {
-      "role": "user",
-      "content": "I need information about AI safety"
-    }
-  ]
-}
-```
-
-**Expected Output (First Interaction):**
-- System asks clarifying questions such as:
-  - What specific aspects of AI safety are you interested in? (technical approaches, policy, ethics, alignment research)
-  - What is your background or use case for this research?
-  - Are there specific time periods or developments you want to focus on?
-
-**Follow-up Input (After Clarification):**
-```json
-{
-  "messages": [
-    {
-      "role": "user",
-      "content": "I need information about AI safety"
-    },
-    {
-      "role": "assistant",
-      "content": "To provide you with the most relevant research, I need to clarify a few things:\n\n- What specific aspects of AI safety are you interested in?\n- What is your background or use case?\n- Are there specific developments you want to focus on?"
-    },
-    {
-      "role": "user",
-      "content": "I'm a software engineer interested in technical approaches to AI alignment, particularly RLHF and constitutional AI. Focus on recent developments from 2023-2024."
-    }
-  ]
-}
-```
-
-**Expected Output (After Clarification):**
-- Generates detailed research brief incorporating user specifications
-- Supervisor coordinates multiple research agents focusing on:
-  - RLHF (Reinforcement Learning from Human Feedback) techniques
-  - Constitutional AI approaches
-  - Recent 2023-2024 developments
-- Final report includes:
-  - Technical overview of RLHF and constitutional AI
-  - Recent research papers and developments
-  - Implementation approaches and challenges
-  - Comparison of different techniques
-  - Sources with citations to recent papers
-
-**Example 3: Complex Multi-Faceted Research**
+**Detailed Research Topic:**
 ```json
 {
   "messages": [
@@ -622,117 +184,7 @@ These graphs demonstrate deep research workflows with multi-agent coordination a
 }
 ```
 
-**Expected Output:**
-- System recognizes sufficient detail provided
-- Generates comprehensive research brief covering:
-  - Deployment options (LangGraph Cloud vs self-hosted)
-  - Monitoring and observability strategies
-  - Scaling patterns and performance optimization
-- Supervisor coordinates parallel research agents for each major topic
-- Final report includes:
-  - Detailed comparison of deployment options
-  - Pros/cons of LangGraph Cloud vs self-hosted
-  - Monitoring tools and integration strategies (LangSmith, custom solutions)
-  - Scaling patterns for high-traffic applications
-  - Cost considerations and trade-offs
-  - Implementation recommendations
-  - Sources and citations
-
-**Example 4: Research with Specific Source Preferences**
-```json
-{
-  "messages": [
-    {
-      "role": "user",
-      "content": "Research the latest developments in large language model architectures, focusing on transformer alternatives and efficiency improvements. Please prioritize academic papers and official research publications over blog posts."
-    }
-  ]
-}
-```
-
-**Expected Output:**
-- Research brief emphasizes academic and official sources
-- Supervisor coordinates research focusing on:
-  - Transformer alternatives (State Space Models, RWKV, etc.)
-  - Efficiency improvements (quantization, pruning, distillation)
-  - Recent architectural innovations
-- Research agents prioritize:
-  - ArXiv papers
-  - Official research lab publications
-  - Conference proceedings (NeurIPS, ICML, ACL)
-- Final report includes:
-  - Overview of transformer alternatives
-  - Detailed analysis of efficiency techniques
-  - Performance comparisons from papers
-  - Future research directions
-  - Extensive citations to academic sources
-
-**Example 5: Iterative Research with Human Feedback**
-```json
-{
-  "messages": [
-    {
-      "role": "user",
-      "content": "I want to understand how companies are using LangGraph in production"
-    }
-  ]
-}
-```
-
-**Expected Output (First Interaction):**
-- System asks clarifying questions:
-  - What industry or use cases are you most interested in?
-  - Are you looking for technical implementation details or business outcomes?
-  - Do you want case studies, architecture patterns, or both?
-
-**Follow-up with Feedback:**
-```json
-{
-  "messages": [
-    {
-      "role": "user",
-      "content": "I want to understand how companies are using LangGraph in production"
-    },
-    {
-      "role": "assistant",
-      "content": "To provide the most relevant research:\n\n- What industry or use cases interest you?\n- Technical details or business outcomes?\n- Case studies, architecture patterns, or both?"
-    },
-    {
-      "role": "user",
-      "content": "Focus on customer support and automation use cases. I want both technical architecture patterns and real-world case studies showing business impact. Include information about challenges they faced and how they solved them."
-    }
-  ]
-}
-```
-
-**Expected Output (After Feedback):**
-- Detailed research brief incorporating all specifications
-- Supervisor coordinates research on:
-  - Customer support automation with LangGraph
-  - Technical architecture patterns
-  - Real-world case studies
-  - Implementation challenges and solutions
-- Final report includes:
-  - Overview of LangGraph in customer support
-  - Common architecture patterns (routing, escalation, memory)
-  - Detailed case studies with business metrics
-  - Technical challenges and solutions
-  - Best practices and lessons learned
-  - Sources including company blogs, technical talks, documentation
-
-**Notes:**
-- The research agent uses a multi-stage workflow: clarification → brief generation → multi-agent research → report synthesis
-- Clarification is adaptive - simple, clear requests proceed directly to research
-- Research brief captures all user requirements and guides downstream research
-- Supervisor coordinates multiple research agents that can work in parallel
-- Each research agent conducts focused research on specific sub-topics
-- Final report synthesizes all findings into a cohesive, well-structured document
-- All reports include proper citations and source references
-- The system adapts to user language - responses match the input language
-- Research depth is comprehensive - reports are detailed and thorough
-- Human-in-the-loop capability allows for iterative refinement
-
-**Configuration:**
+Configuration:
 ```json
 {
   "configurable": {
