@@ -10,7 +10,7 @@ ruff==0.8.4
 mypy==1.13.0
 
 # Pre-commit Hooks
-pre-commit==4.0.1
+pre-commit==4.4.0
 
 # Security Tools
 bandit[toml]==1.8.0
