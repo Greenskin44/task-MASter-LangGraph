@@ -5,9 +5,9 @@
 -r requirements.txt
 
 # Code Quality Tools
-black==24.10.0
-ruff==0.8.4
-mypy==1.13.0
+black==25.11.0
+ruff==0.14.6
+mypy==1.18.2
 
 # Pre-commit Hooks
 pre-commit==4.0.1
